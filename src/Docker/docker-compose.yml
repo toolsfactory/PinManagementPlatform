@@ -1,0 +1,83 @@
+version: '3.4'
+
+services:
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf
+  
+  exceptionless:
+    image: exceptionless/exceptionless:6.1.0
+    volumes:
+      - ./.shares/exceptionless/data:/usr/share/elasticsearch/data
+    ports:
+      - 5001:80
+
+  healthcheckui:
+    image: xabarilcoding/healthchecksui
+    ports:
+      - 5000:80
+    environment:
+      - Logging:LogLevel:Default=Information
+      - Logging:Loglevel:Microsoft=Warning
+      - Logging:LogLevel:HealthChecks=Warning
+      - HealthChecksUI:HealthChecks:0:Name=PinChangeService
+      - HealthChecksUI:HealthChecks:0:Uri=http://pinchangeservice/healthz
+      - HealthChecksUI:HealthChecks:1:Name=PinVerifyService
+      - HealthChecksUI:HealthChecks:1:Uri=http://pinverifyservice/healthz
+      - HealthChecksUI:HealthChecks:2:Name=PinSettingsService
+      - HealthChecksUI:HealthChecks:2:Uri=http://pinsettingsservice/healthz
+
+
+
+
+  pinchangeservice:
+    image: ${DOCKER_REGISTRY-}servicespinchange
+    build:
+      context: .
+      dockerfile: ../Services.PinChange/Dockerfile
+    ports:
+    - 80:80
+    environment:
+      - EXCEPTIONLESS_URL=http://exceptionless:80
+      - EXCEPTIONLESS_APIKEY=nkBXORItJVsXkarjdLvRrxI2u7sfmx9xHByjx9Kp
+    depends_on:
+      - exceptionless
+      - redis
+    volumes:
+      - ./.shares/PinChangeService/log:/var/log/PinChangeService
+
+  pinsettingsservice:
+    image: ${DOCKER_REGISTRY-}servicespinsettings
+    build:
+      context: ..
+      dockerfile: Services.PinSettings/Dockerfile
+    ports:
+    - 81:80
+    environment:
+      - EXCEPTIONLESS_URL=http://exceptionless:80
+      - EXCEPTIONLESS_APIKEY=nkBXORItJVsXkarjdLvRrxI2u7sfmx9xHByjx9Kp
+    depends_on:
+      - exceptionless
+      - redis
+    volumes:
+      - ./.shares/PinSettingsService/log:/var/log/PinChangeService
+
+  pinverifyservice:
+    image: ${DOCKER_REGISTRY-}servicespinverify
+    build:
+      context: ..
+      dockerfile: Services.PinVerify/Dockerfile
+    ports:
+    - 82:80
+    environment:
+      - EXCEPTIONLESS_URL=http://exceptionless:80
+      - EXCEPTIONLESS_APIKEY=nkBXORItJVsXkarjdLvRrxI2u7sfmx9xHByjx9Kp
+    depends_on:
+      - exceptionless
+      - redis
+    volumes:
+      - ./.shares/PinVerifyService/log:/var/log/PinVerifyService
+
