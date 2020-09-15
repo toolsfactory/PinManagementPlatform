@@ -1,4 +1,4 @@
-﻿namespace PinPlatform.Services.PinChange.DataModel
+﻿namespace PinPlatform.Common.DataModels
 {
     public enum PinValidationMode
     {

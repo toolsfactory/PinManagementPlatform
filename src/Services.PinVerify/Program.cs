@@ -6,7 +6,7 @@ using Exceptionless;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting.Initialization;
 using Serilog;
 
 namespace PinPlatform.Services.PinVerify
@@ -38,13 +38,15 @@ namespace PinPlatform.Services.PinVerify
                 .CreateLogger();
                 Log.Information($"Main: Serilog logging initialized with Exceptionless at {exceptionless_url}");
             }
-            Log.Information("Main: Starting WebApiService");
+            Log.Information("Main: Starting PinVerifyService");
             try
             {
                 Log.Information("Main: Creating HostBuilder");
                 var builder = CreateHostBuilder(args);
                 Log.Information("Main: Building Host");
                 var host = builder.Build();
+                Log.Information("Main: Initializing Host");
+                host.Init();
                 Log.Information("Main: Starting Host");
                 host.Run();
                 Log.Information("Main: Host started successfully");
@@ -62,6 +64,7 @@ namespace PinPlatform.Services.PinVerify
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

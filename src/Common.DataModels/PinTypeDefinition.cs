@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PinPlatform.Services.PinChange.DataModel
+namespace PinPlatform.Common.DataModels
 {
     public class PinTypeDefinition
     {

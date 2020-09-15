@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace PinPlatform.Services.PinChange.DataModel
+namespace PinPlatform.Common.DataModels
 {
     public class OpCoConfiguration
     {

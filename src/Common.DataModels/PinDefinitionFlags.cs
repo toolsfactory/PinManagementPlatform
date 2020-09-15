@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PinPlatform.Services.PinChange.DataModel
+namespace PinPlatform.Common.DataModels
 {
     [Flags]
     public enum PinDefinitionFlags : uint

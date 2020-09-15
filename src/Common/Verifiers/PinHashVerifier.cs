@@ -4,10 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using PinPlatform.Common.Interfaces;
 
-namespace PinPlatform.Common
+namespace PinPlatform.Common.Verifiers
 {
-    public class PinHashVerifier
+    public class PinHashVerifier : IPinHashVerifier
     {
         private const string FailedLastSuffix = "failed-last";
         private const string FailedCountSuffix = "failed-count";
@@ -20,7 +21,7 @@ namespace PinPlatform.Common
         private uint? _pinType;
         private string _cachePrefix = String.Empty;
         private string? _storedPinHash = default;
-        private DataModels.RequestorInfo _requestor;
+        private DataModels.RequestorInfo? _requestor;
 
         public int FailedAttemptsCount { get; private set; }
         public DateTime LastFailedAttempt { get; private set; }
@@ -31,8 +32,11 @@ namespace PinPlatform.Common
             _redisClient = redisClient;
         }
 
-        public async Task<(bool success, ErrorCodes error)> VerifyPinHashAsync(Common.DataModels.RequestorInfo requestor, uint? pinType, string pinHash)
+        public async Task<(bool Success, ErrorCodes Error)> VerifyPinHashAsync(Common.DataModels.RequestorInfo requestor, uint? pinType, string pinHash)
         {
+            if (requestor is null)
+                throw new ArgumentNullException(nameof(requestor));
+
             _requestor = requestor;
             _pinHash = pinHash;
             _pinType = pinType;
@@ -40,7 +44,7 @@ namespace PinPlatform.Common
             GenerateCachingPrefix();
             await LoadFailedAttemptsInfoAsync();
 
-            if(IsInGracePeriod())
+            if (IsInGracePeriod())
             {
                 return (false, ErrorCodes.WithinGracePeriod);
             }
@@ -53,7 +57,7 @@ namespace PinPlatform.Common
                 await RemoveFailedAttemptsInfoAsync();
                 LogSuccessfulVerification();
                 return (true, ErrorCodes.NoError);
-            } 
+            }
             else
             {
                 await UpdateFailedAttemptsInfoAsync();
@@ -78,7 +82,7 @@ namespace PinPlatform.Common
 
         private async Task RemoveFailedAttemptsInfoAsync()
         {
-            await _redisClient.Db0.RemoveAllAsync(new[] { _cachePrefix + FailedCountSuffix, _cachePrefix + FailedLastSuffix});
+            await _redisClient.Db0.RemoveAllAsync(new[] { _cachePrefix + FailedCountSuffix, _cachePrefix + FailedLastSuffix });
         }
 
         private async Task UpdateFailedAttemptsInfoAsync()
@@ -128,7 +132,7 @@ namespace PinPlatform.Common
 
         private void GenerateCachingPrefix()
         {
-            var sb = new StringBuilder(_requestor.OpCoId);
+            var sb = new StringBuilder(_requestor!.OpCoId);
             sb.Append("-");
             sb.Append(_requestor.HouseholdId);
             sb.Append("-");

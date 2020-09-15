@@ -1,21 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Initialization;
-using Microsoft.Extensions.Logging;
-using PinPlatform.Common;
-using Serilog.AspNetCore;
-using Services.PinChange;
-using StackExchange.Redis.Extensions;
+using PinPlatform.Common.Interfaces;
+using PinPlatform.Common.Verifiers;
+using PinPlatform.Common.DataStores;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
 
@@ -39,7 +32,9 @@ namespace PinPlatform.Services.PinChange
             services.AddSwaggerGen();
             services.AddStackExchangeRedisExtensions<SystemTextJsonSerializer>(redisConfiguration);
             services.AddInitialization();
-            services.AddTransient<PinHashVerifier>();
+            services.AddTransient<IPinHashVerifier, PinHashVerifier>();
+            services.AddTransient<IPinChangeVerifier, PinChangeVerifier>();
+            services.AddTransient<IOpCoVerifier, OpCoVerifier>();
 
             // Registering PinRulesConfigurationStore three times to ensure that one singleton can be access with both interfaces required
             services.AddSingleton<PinRulesConfigurationStore>();

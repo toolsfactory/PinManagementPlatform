@@ -38,7 +38,7 @@ namespace PinPlatform.Services.PinChange
                 .CreateLogger();
                 Log.Information($"Main: Serilog logging initialized with Exceptionless at {exceptionless_url}");
             }
-            Log.Information("Main: Starting WebApiService");
+            Log.Information("Main: Starting PinChangeService");
             try
             {
                 Log.Information("Main: Creating HostBuilder");

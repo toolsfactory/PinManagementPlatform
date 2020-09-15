@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PinPlatform.Services.PinChange.DataModel
+namespace PinPlatform.Services.PinVerify.DataModel
 {
-    public class PinChangeRequestModel
+    public class PinVerifyRequestModel
     {
         [Required]
         public PinPlatform.Common.DataModels.RequestorInfo? Requestor { get; set; }
@@ -14,9 +14,6 @@ namespace PinPlatform.Services.PinChange.DataModel
         public uint PinType { get; set; }
         [Required]
         [StringLength(64, MinimumLength = 64)]
-        public string OldPinHash { get; set; } = String.Empty;
-        [Required]
-        [StringLength(16, MinimumLength = 4)]
-        public string NewPin { get; set; } = String.Empty;
+        public string PinHash { get; set; } = String.Empty;
     }
 }

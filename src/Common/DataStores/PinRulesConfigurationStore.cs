@@ -1,19 +1,17 @@
 ﻿using Microsoft.Extensions.Hosting.Initialization;
 using Microsoft.Extensions.Logging;
-using PinPlatform.Services.PinChange.DataModel;
-using System;
+using PinPlatform.Common.DataModels;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
+using PinPlatform.Common.Interfaces;
 
-namespace Services.PinChange
+namespace PinPlatform.Common.DataStores
 {
-    public interface IRulesConfiguratonStore : IAsyncInitializer
-    {
-        IDictionary<string, OpCoConfiguration> OpCoConfigurations { get; }
-    }
 
-    public class PinRulesConfigurationStore : IRulesConfiguratonStore
+    public class PinRulesConfigurationStore : IRulesConfiguratonStore, IAsyncInitializer
     {
         private readonly ILogger<PinRulesConfigurationStore> _logger;
 
@@ -32,7 +30,20 @@ namespace Services.PinChange
             var t2 = GenerateParentalPinDefinition();
             pintypes.Add(t1.Id, t1);
             pintypes.Add(t2.Id, t2);
-            var opco = new OpCoConfiguration("DE", pintypes, 0);
+            var opco1 = new OpCoConfiguration("vfde", pintypes, 0);
+            var opco2 = new OpCoConfiguration("vfuk", new Dictionary<ushort, PinTypeDefinition>(), 0);
+            _opCoConfigurations.Add(opco1.Id, opco1);
+            _opCoConfigurations.Add(opco2.Id, opco2);
+
+            var sw = Stopwatch.StartNew();
+            var sha=SHA256.Create();
+            for(var i = 0; i<1000000; i++)
+            {
+                var str = i.ToString();
+                var bytes = Encoding.ASCII.GetBytes(str);
+                var shaed = sha.ComputeHash(bytes);
+            }
+            sw.Stop();
 
             return Task.CompletedTask;
         }
