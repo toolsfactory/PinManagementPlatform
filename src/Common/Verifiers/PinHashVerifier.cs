@@ -15,7 +15,7 @@ namespace PinPlatform.Common.Verifiers
         private const string HashSuffix = "hash";
 
         private readonly ILogger<PinHashVerifier> _logger;
-        private readonly IRedisCacheClient _redisClient;
+        private readonly IPinDataStore _pinDataStore;
 
         private string _pinHash = String.Empty;
         private uint? _pinType;
@@ -23,13 +23,13 @@ namespace PinPlatform.Common.Verifiers
         private string? _storedPinHash = default;
         private DataModels.RequestorInfo? _requestor;
 
-        public int FailedAttemptsCount { get; private set; }
+        public uint FailedAttemptsCount { get; private set; }
         public DateTime LastFailedAttempt { get; private set; }
 
-        public PinHashVerifier(ILogger<PinHashVerifier> logger, IRedisCacheClient redisClient)
+        public PinHashVerifier(ILogger<PinHashVerifier> logger, IPinDataStore pinDataStore)
         {
             _logger = logger;
-            _redisClient = redisClient;
+            _pinDataStore = pinDataStore;
         }
 
         public async Task<(bool Success, ErrorCodes Error)> VerifyPinHashAsync(Common.DataModels.RequestorInfo requestor, uint? pinType, string pinHash)
@@ -76,21 +76,19 @@ namespace PinPlatform.Common.Verifiers
 
         private async Task LoadFailedAttemptsInfoAsync()
         {
-            FailedAttemptsCount = await _redisClient.Db0.GetAsync<int?>(_cachePrefix + FailedCountSuffix) ?? 0;
-            LastFailedAttempt = await _redisClient.Db0.GetAsync<DateTime?>(_cachePrefix + FailedLastSuffix) ?? DateTime.MinValue;
+            (FailedAttemptsCount, LastFailedAttempt) = await _pinDataStore.GetFailedVerificationsInfoAsync(_requestor!, _pinType);
         }
 
         private async Task RemoveFailedAttemptsInfoAsync()
         {
-            await _redisClient.Db0.RemoveAllAsync(new[] { _cachePrefix + FailedCountSuffix, _cachePrefix + FailedLastSuffix });
+            await _pinDataStore.DeleteFailedAttemptsInfoAsync(_requestor!, _pinType);
         }
 
         private async Task UpdateFailedAttemptsInfoAsync()
         {
             FailedAttemptsCount++;
             LastFailedAttempt = DateTime.Now;
-            await _redisClient.Db0.AddAsync(_cachePrefix + FailedCountSuffix, FailedAttemptsCount);
-            await _redisClient.Db0.AddAsync(_cachePrefix + FailedLastSuffix, LastFailedAttempt);
+            await _pinDataStore.UpdateFailedVerificationsInfoAsync(_requestor!, _pinType, FailedAttemptsCount, LastFailedAttempt);
         }
 
         private bool IsInGracePeriod()
@@ -108,11 +106,11 @@ namespace PinPlatform.Common.Verifiers
             };
         }
 
-        private int GetGracePeriodForFailedCount(int failedAttemptsCount) => failedAttemptsCount switch
+        private int GetGracePeriodForFailedCount(uint failedAttemptsCount) => failedAttemptsCount switch
         {
-            int count when count < 3 => 30,
-            int count when count < 6 => 60,
-            int count when count < 9 => 90,
+            uint count when count < 3 => 30,
+            uint count when count < 6 => 60,
+            uint count when count < 9 => 90,
             _ => 120
         };
 
@@ -120,8 +118,7 @@ namespace PinPlatform.Common.Verifiers
         {
             try
             {
-                var result = await _redisClient.Db0.Database.StringGetAsync(_cachePrefix + HashSuffix);
-                _storedPinHash = result.HasValue ? result.ToString() : default;
+                _storedPinHash = await _pinDataStore.GetPinHashAsync(_requestor!, _pinType);
                 return _storedPinHash != null;
             }
             catch (Exception ex)

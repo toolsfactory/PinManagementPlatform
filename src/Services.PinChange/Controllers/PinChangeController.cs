@@ -13,14 +13,12 @@ namespace PinPlatform.Services.PinChange.Controllers
     public class PinChangeController: ControllerBase
     {
         private readonly ILogger<PinChangeController> _logger;
-        private readonly IPinHashVerifier _pinCheckVerifier;
         private readonly IOpCoVerifier _opCoVerifier;
         private readonly IPinChangeVerifier _pinChangeVerifier;
 
-        public PinChangeController(ILogger<PinChangeController> logger, IPinHashVerifier pinCheckVerifier, IOpCoVerifier opCoVerifier, IPinChangeVerifier pinChangeVerifier)
+        public PinChangeController(ILogger<PinChangeController> logger, IOpCoVerifier opCoVerifier, IPinChangeVerifier pinChangeVerifier)
         {
             _logger = logger;
-            _pinCheckVerifier = pinCheckVerifier;
             _opCoVerifier = opCoVerifier;
             _pinChangeVerifier = pinChangeVerifier;
         }
@@ -34,13 +32,9 @@ namespace PinPlatform.Services.PinChange.Controllers
             if (!opcoVerifyResult.Success)
                 return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = "Validation error" });
 
-            var pinVerifyResult = await _pinCheckVerifier.VerifyPinHashAsync(request.Requestor!, request.PinType, request.OldPinHash);
-            if (!pinVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode =(int)pinVerifyResult.Error, ErrorText = "Validation error" });
-
             var pinChangeResult = _pinChangeVerifier.CheckNewPinAgainstRules(opcoid, request.PinType, request.NewPin);
-            if (!pinVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinVerifyResult.Error, ErrorText = "Validation error" });
+            if (!pinChangeResult.Success)
+                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinChangeResult.Error, ErrorText = "Validation error" });
 
             return Ok();
         }

@@ -13,9 +13,6 @@ namespace PinPlatform.Services.PinChange.DataModel
         [Range(0,99)]
         public uint PinType { get; set; }
         [Required]
-        [StringLength(64, MinimumLength = 64)]
-        public string OldPinHash { get; set; } = String.Empty;
-        [Required]
         [StringLength(16, MinimumLength = 4)]
         public string NewPin { get; set; } = String.Empty;
     }

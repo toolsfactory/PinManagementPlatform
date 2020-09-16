@@ -6,7 +6,7 @@ namespace PinPlatform.Common.Interfaces
 {
     public interface IPinHashVerifier
     {
-        int FailedAttemptsCount { get; }
+        uint FailedAttemptsCount { get; }
         DateTime LastFailedAttempt { get; }
 
         Task<(bool Success, ErrorCodes Error)> VerifyPinHashAsync(RequestorInfo requestor, uint? pinType, string pinHash);

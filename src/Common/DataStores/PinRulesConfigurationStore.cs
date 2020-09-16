@@ -10,7 +10,6 @@ using PinPlatform.Common.Interfaces;
 
 namespace PinPlatform.Common.DataStores
 {
-
     public class PinRulesConfigurationStore : IRulesConfiguratonStore, IAsyncInitializer
     {
         private readonly ILogger<PinRulesConfigurationStore> _logger;
