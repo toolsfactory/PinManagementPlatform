@@ -32,7 +32,7 @@ namespace PinPlatform.Common.Verifiers
                 throw new ArgumentNullException(nameof(requestor));
 
             _requestor = requestor;
-            var hash = System.Text.ASCIIEncoding.ASCII.GetBytes(pinHash);
+            var hash = Encoding.ASCII.GetBytes(pinHash);
             _pinType = pinType;
 
             await LoadFailedAttemptsInfoAsync();

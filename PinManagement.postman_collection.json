@@ -1,0 +1,40 @@
+{
+	"info": {
+		"_postman_id": "2fa438bb-5c14-4477-8910-449194099d87",
+		"name": "PinManagement",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Pin Verify Request for VFDE-0000-1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Requestor\" : \r\n    {\r\n        \"HouseholdId\" : \"0000\",\r\n        \"ProfileId\" : \"1\",\r\n        \"OpCoId\": \"vfde\"\r\n    },\r\n    \"PinType\" : 1,\r\n    \"PinHash\": \"03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:82/v1/vfde/pinverify",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "82",
+					"path": [
+						"v1",
+						"vfde",
+						"pinverify"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
