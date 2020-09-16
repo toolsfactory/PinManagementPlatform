@@ -5,10 +5,12 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System.Text;
 using System;
+using Microsoft.Extensions.Hosting.Initialization;
+using System.Security.Cryptography;
 
 namespace PinPlatform.Common.DataStores
 {
-    public class PinDataStore : IPinDataStore
+    public class PinDataStore : IPinDataStore, IAsyncInitializer
     {
         private const string FailedLastSuffix = "failed-last";
         private const string FailedCountSuffix = "failed-count";
@@ -23,6 +25,7 @@ namespace PinPlatform.Common.DataStores
             _redisClient = redisClient;
         }
 
+        #region IPinDataStore Implenetation
         public async Task DeleteFailedAttemptsInfoAsync(RequestorInfo requestor, uint? pinType)
         {
             var prefix = GenerateCachingPrefix(requestor, pinType);
@@ -38,16 +41,18 @@ namespace PinPlatform.Common.DataStores
             return (FailedAttemptsCount, LastFailedAttempt);
         }
 
-        public async Task<string?> GetPinHashAsync(RequestorInfo requestor, uint? pinType)
+        public async Task<byte[]?> GetPinHashAsync(RequestorInfo requestor, uint? pinType)
         {
             var prefix = GenerateCachingPrefix(requestor, pinType);
-            var hash = await _redisClient.Db0.Database.StringGetAsync(prefix + HashSuffix);
-            return hash.HasValue ? hash.ToString() : default;
+            var hash = await _redisClient.Db0.GetAsync<byte[]?>(prefix + HashSuffix);
+            //            var hash = await _redisClient.Db0.Database.StringGetAsync(prefix + HashSuffix);
+            return hash;
         }
 
-        public Task SetPinHashAsync(RequestorInfo requestor, uint? pinType, string hash)
+        public async Task SetPinHashAsync(RequestorInfo requestor, uint? pinType, byte[] hash)
         {
-            throw new System.NotImplementedException();
+            var prefix = GenerateCachingPrefix(requestor, pinType);
+            await _redisClient.Db0.AddAsync(prefix + HashSuffix, hash);
         }
 
         public async Task UpdateFailedVerificationsInfoAsync(RequestorInfo requestor, uint? pinType, uint failedAttempts, DateTime lastFailed)
@@ -56,7 +61,25 @@ namespace PinPlatform.Common.DataStores
             await _redisClient.Db0.AddAsync(prefix + FailedCountSuffix, failedAttempts);
             await _redisClient.Db0.AddAsync(prefix + FailedLastSuffix, lastFailed);
         }
+        #endregion
 
+        #region IAsyncInitializer implementation
+        public async Task InitializeAsync()
+        {
+            var sha = SHA256.Create();
+            var req = new RequestorInfo() { HouseholdId = "0000", OpCoId = "vfde", ProfileId = "1" };
+            var prefix = GenerateCachingPrefix(req, 1);
+            await _redisClient.Db0.AddAsync(prefix + FailedCountSuffix, 2);
+            await _redisClient.Db0.AddAsync(prefix + FailedLastSuffix, DateTime.Now);
+            await _redisClient.Db0.AddAsync(prefix + HashSuffix, sha.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes("1234")));
+
+            req = new RequestorInfo() { HouseholdId = "0001", OpCoId = "vfde", ProfileId = "1" };
+            prefix = GenerateCachingPrefix(req, 1);
+            await _redisClient.Db0.AddAsync(prefix + HashSuffix, sha.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes("1234")));
+        }
+        #endregion
+
+        #region private helpers
         private string GenerateCachingPrefix(RequestorInfo requestor, uint? pinType)
         {
             var sb = new StringBuilder(requestor!.OpCoId);
@@ -73,5 +96,6 @@ namespace PinPlatform.Common.DataStores
             sb.Append("-");
             return sb.ToString();
         }
+        #endregion
     }
 }

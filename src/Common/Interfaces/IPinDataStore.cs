@@ -8,7 +8,7 @@ namespace PinPlatform.Common.Interfaces
         Task<(uint FailedAttemptsCount, DateTime LastFailedAttempt)> GetFailedVerificationsInfoAsync(DataModels.RequestorInfo requestor, uint? pinType);
         Task UpdateFailedVerificationsInfoAsync(DataModels.RequestorInfo requestor, uint? pinType, uint failedAtempts, DateTime lastFailed);
         Task DeleteFailedAttemptsInfoAsync(DataModels.RequestorInfo requestor, uint? pinType);
-        Task<string?> GetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType);
-        Task SetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType, string hash);
+        Task<byte[]?> GetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType);
+        Task SetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType, byte[] hash);
     }
 }

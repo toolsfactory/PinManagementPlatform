@@ -39,6 +39,10 @@ namespace PinPlatform.Services.PinVerify
             services.AddSingleton<PinRulesConfigurationStore>();
             services.AddSingleton<IAsyncInitializer>(x => x.GetRequiredService<PinRulesConfigurationStore>());
             services.AddSingleton<IRulesConfiguratonStore>(x => x.GetRequiredService<PinRulesConfigurationStore>());
+
+            services.AddSingleton<PinDataStore>();
+            services.AddSingleton<IAsyncInitializer>(x => x.GetRequiredService<PinDataStore>());
+            services.AddSingleton<IPinDataStore>(x => x.GetRequiredService<PinDataStore>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
