@@ -30,12 +30,12 @@ namespace PinPlatform.Services.PinChange.Controllers
         {
             var opcoVerifyResult = _opCoVerifier.CheckIfOpCoHasPinService(opcoid);
             if (!opcoVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = "Validation error" });
+                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(opcoVerifyResult.Error) });
 
             var pinChangeResult = _pinChangeVerifier.CheckNewPinAgainstRules(opcoid, request.PinType, request.NewPin);
             if (!pinChangeResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinChangeResult.Error, ErrorText = "Validation error" });
-
+                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinChangeResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(pinChangeResult.Error) });
+            
             return Ok();
         }
     }

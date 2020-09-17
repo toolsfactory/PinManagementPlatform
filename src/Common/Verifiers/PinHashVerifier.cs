@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using PinPlatform.Common.Interfaces;
+using System.Linq;
 
 namespace PinPlatform.Common.Verifiers
 {
@@ -32,7 +33,7 @@ namespace PinPlatform.Common.Verifiers
                 throw new ArgumentNullException(nameof(requestor));
 
             _requestor = requestor;
-            var hash = Encoding.ASCII.GetBytes(pinHash);
+            var hash = StringToByteArray(pinHash); // Encoding.ASCII.GetBytes(pinHash);
             _pinType = pinType;
 
             await LoadFailedAttemptsInfoAsync();
@@ -45,7 +46,7 @@ namespace PinPlatform.Common.Verifiers
             if (!await LoadPinHashAsync())
                 return (false, ErrorCodes.NoPinHashFound);
 
-            if (hash == _storedPinHash)
+            if ((hash.Length == _storedPinHash!.Length ) && hash.SequenceEqual(_storedPinHash))
             {
                 await RemoveFailedAttemptsInfoAsync();
                 LogSuccessfulVerification();
@@ -111,6 +112,15 @@ namespace PinPlatform.Common.Verifiers
         {
             _storedPinHash = await _pinDataStore.GetPinHashAsync(_requestor!, _pinType);
             return _storedPinHash != null;
+        }
+
+        private static byte[] StringToByteArray(String hex)
+        {
+            int NumberChars = hex.Length;
+            byte[] bytes = new byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
         }
     }
 }

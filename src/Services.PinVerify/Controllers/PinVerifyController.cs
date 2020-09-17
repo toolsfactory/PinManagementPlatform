@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common.DataModels;
 using PinPlatform.Common.Interfaces;
+using PinPlatform.Common;
 
 namespace PinPlatform.Services.PinVerify.Controllers
 {
@@ -29,11 +30,11 @@ namespace PinPlatform.Services.PinVerify.Controllers
         {
             var opcoVerifyResult = _opCoVerifier.CheckIfOpCoHasPinService(opcoid);
             if (!opcoVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = "Validation error" });
+                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(opcoVerifyResult.Error) });
 
             var pinVerifyResult = await _pinCheckVerifier.VerifyPinHashAsync(request.Requestor!, request.PinType, request.PinHash);
             if (!pinVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinVerifyResult.Error, ErrorText = "Validation error" });
+                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinVerifyResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(pinVerifyResult.Error) });
 
             return Ok();
         }

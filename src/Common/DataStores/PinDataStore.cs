@@ -71,11 +71,12 @@ namespace PinPlatform.Common.DataStores
             var prefix = GenerateCachingPrefix(req, 1);
             await _redisClient.Db0.AddAsync(prefix + FailedCountSuffix, 2);
             await _redisClient.Db0.AddAsync(prefix + FailedLastSuffix, DateTime.Now);
-            await _redisClient.Db0.AddAsync(prefix + HashSuffix, sha.ComputeHash(Encoding.ASCII.GetBytes("1234")));
+            byte[] value = sha.ComputeHash(Encoding.ASCII.GetBytes("1234"));
+            await _redisClient.Db0.AddAsync(prefix + HashSuffix, value);
 
             req = new RequestorInfo() { HouseholdId = "0001", OpCoId = "vfde", ProfileId = "1" };
             prefix = GenerateCachingPrefix(req, 1);
-            await _redisClient.Db0.AddAsync(prefix + HashSuffix, sha.ComputeHash(Encoding.ASCII.GetBytes("1234")));
+            await _redisClient.Db0.AddAsync(prefix + HashSuffix, value);
         }
         #endregion
 
