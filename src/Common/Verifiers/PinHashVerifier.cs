@@ -15,7 +15,7 @@ namespace PinPlatform.Common.Verifiers
         private readonly IPinDataStore _pinDataStore;
 
         private uint? _pinType;
-        private byte[]? _storedPinHash = default;
+        private string? _storedPinHash = default;
         private DataModels.RequestorInfo? _requestor;
 
         public uint FailedAttemptsCount { get; private set; }
@@ -33,7 +33,7 @@ namespace PinPlatform.Common.Verifiers
                 throw new ArgumentNullException(nameof(requestor));
 
             _requestor = requestor;
-            var hash = StringToByteArray(pinHash); // Encoding.ASCII.GetBytes(pinHash);
+            var hash = pinHash; // StringToByteArray(pinHash); // Encoding.ASCII.GetBytes(pinHash);
             _pinType = pinType;
 
             await LoadFailedAttemptsInfoAsync();
@@ -46,7 +46,7 @@ namespace PinPlatform.Common.Verifiers
             if (!await LoadPinHashAsync())
                 return (false, ErrorCodes.NoPinHashFound);
 
-            if ((hash.Length == _storedPinHash!.Length ) && hash.SequenceEqual(_storedPinHash))
+            if ((hash.Length == _storedPinHash!.Length ) && hash.Equals(_storedPinHash))
             {
                 await RemoveFailedAttemptsInfoAsync();
                 LogSuccessfulVerification();
@@ -114,6 +114,7 @@ namespace PinPlatform.Common.Verifiers
             return _storedPinHash != null;
         }
 
+        /*
         private static byte[] StringToByteArray(String hex)
         {
             int NumberChars = hex.Length;
@@ -122,5 +123,6 @@ namespace PinPlatform.Common.Verifiers
                 bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
         }
+        */
     }
 }

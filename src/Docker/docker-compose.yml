@@ -8,6 +8,26 @@ services:
     volumes:
       - ../redis/redis.conf:/usr/local/etc/redis/redis.conf
   
+  db:
+    image: mariadb
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: test123
+      MYSQL_DATABASE: DEMODB
+      MYSQL_USER: DEMODB_Admin
+      MYSQL_PASSWORD: demo
+    volumes:
+      - ./.shares/mysql/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 5002:8080
+
   exceptionless:
     image: exceptionless/exceptionless:6.1.0
     volumes:

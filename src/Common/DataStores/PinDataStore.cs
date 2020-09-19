@@ -7,10 +7,11 @@ using System.Text;
 using System;
 using Microsoft.Extensions.Hosting.Initialization;
 using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
 
 namespace PinPlatform.Common.DataStores
 {
-    public class PinDataStore : IPinDataStore, IAsyncInitializer
+    public class PinDataStore : IPinDataStore
     {
         private const string FailedLastSuffix = "failed-last";
         private const string FailedCountSuffix = "failed-count";
@@ -18,11 +19,13 @@ namespace PinPlatform.Common.DataStores
 
         private readonly ILogger<IPinDataStore> _logger;
         private readonly IRedisCacheClient _redisClient;
+        private readonly DEMODBContext _dbContext;
 
-        public PinDataStore(ILogger<IPinDataStore> logger, IRedisCacheClient redisClient)
+        public PinDataStore(ILogger<IPinDataStore> logger, IRedisCacheClient redisClient, DEMODBContext dbContext)
         {
             _logger = logger;
             _redisClient = redisClient;
+            _dbContext = dbContext;
         }
 
         #region IPinDataStore Implenetation
@@ -41,15 +44,29 @@ namespace PinPlatform.Common.DataStores
             return (FailedAttemptsCount, LastFailedAttempt);
         }
 
-        public async Task<byte[]?> GetPinHashAsync(RequestorInfo requestor, uint? pinType)
+        public async Task<string?> GetPinHashAsync(RequestorInfo requestor, uint? pinType)
         {
-            var prefix = GenerateCachingPrefix(requestor, pinType);
-            var hash = await _redisClient.Db0.GetAsync<byte[]?>(prefix + HashSuffix);
-            //            var hash = await _redisClient.Db0.Database.StringGetAsync(prefix + HashSuffix);
-            return hash;
+            try
+            {
+                var prefix = GenerateCachingPrefix(requestor, pinType);
+                var hash = await _redisClient.Db0.GetAsync<string>(prefix + HashSuffix);
+                if (hash == null)
+                {
+                    var loaded = await _dbContext.Pins.FirstOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == pinType);
+                    if (loaded != null)
+                    {
+                        await _redisClient.Db0.AddAsync(prefix + HashSuffix, loaded.PinHash);
+                        return loaded.PinHash;
+                    }
+                }
+                return hash;
+            } catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
-        public async Task SetPinHashAsync(RequestorInfo requestor, uint? pinType, byte[] hash)
+        public async Task SetPinHashAsync(RequestorInfo requestor, uint? pinType, string hash)
         {
             var prefix = GenerateCachingPrefix(requestor, pinType);
             await _redisClient.Db0.AddAsync(prefix + HashSuffix, hash);
@@ -63,23 +80,6 @@ namespace PinPlatform.Common.DataStores
         }
         #endregion
 
-        #region IAsyncInitializer implementation
-        public async Task InitializeAsync()
-        {
-            var sha = SHA256.Create();
-            var req = new RequestorInfo() { HouseholdId = "0000", OpCoId = "vfde", ProfileId = "1" };
-            var prefix = GenerateCachingPrefix(req, 1);
-            await _redisClient.Db0.AddAsync(prefix + FailedCountSuffix, 2);
-            await _redisClient.Db0.AddAsync(prefix + FailedLastSuffix, DateTime.Now);
-            byte[] value = sha.ComputeHash(Encoding.ASCII.GetBytes("1234"));
-            await _redisClient.Db0.AddAsync(prefix + HashSuffix, value);
-
-            req = new RequestorInfo() { HouseholdId = "0001", OpCoId = "vfde", ProfileId = "1" };
-            prefix = GenerateCachingPrefix(req, 1);
-            await _redisClient.Db0.AddAsync(prefix + HashSuffix, value);
-        }
-        #endregion
-
         #region private helpers
         private string GenerateCachingPrefix(RequestorInfo requestor, uint? pinType)
         {
@@ -87,13 +87,10 @@ namespace PinPlatform.Common.DataStores
             sb.Append("-");
             sb.Append(requestor.HouseholdId);
             sb.Append("-");
-            if (requestor.ProfileId != null)
-            {
-                sb.Append(requestor.ProfileId);
-                sb.Append("-");
-            }
+            sb.Append(requestor.ProfileId);
+            sb.Append("-");
             sb.Append("pin-");
-            sb.Append(pinType.HasValue ? pinType.Value.ToString() : "D");
+            sb.Append(pinType.HasValue ? pinType.Value.ToString() : "0");
             sb.Append("-");
             return sb.ToString();
         }

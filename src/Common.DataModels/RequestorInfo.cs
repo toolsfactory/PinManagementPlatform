@@ -6,7 +6,7 @@ namespace PinPlatform.Common.DataModels
     {
         [Required]
         public string HouseholdId { get; set; } = string.Empty;
-        public string? ProfileId { get; set; }
+        public uint ProfileId { get; set; }
         public string OpCoId { get; set; } = string.Empty;
     }
 }

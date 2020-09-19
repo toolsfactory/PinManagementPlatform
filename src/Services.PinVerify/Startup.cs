@@ -11,6 +11,8 @@ using PinPlatform.Common.Verifiers;
 using PinPlatform.Common.DataStores;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using MySql.Data.MySqlClient;
 
 namespace PinPlatform.Services.PinVerify
 {
@@ -40,10 +42,26 @@ namespace PinPlatform.Services.PinVerify
             services.AddSingleton<IAsyncInitializer>(x => x.GetRequiredService<PinRulesConfigurationStore>());
             services.AddSingleton<IRulesConfiguratonStore>(x => x.GetRequiredService<PinRulesConfigurationStore>());
 
-            services.AddSingleton<PinDataStore>();
-            services.AddSingleton<IAsyncInitializer>(x => x.GetRequiredService<PinDataStore>());
-            services.AddSingleton<IPinDataStore>(x => x.GetRequiredService<PinDataStore>());
+            services.AddTransient<IPinDataStore, PinDataStore>();
+            services.AddEntityFrameworkMySql();
+            services.AddDbContextPool<PinPlatform.Common.DEMODBContext>(
+                options => options.UseMySql("server=db;port=3306;user=root;password=test123;database=DEMODB"));
         }
+
+        /*
+        private static string GetConnectionString()
+        {
+            var csb = new MySqlConnectionStringBuilder(AppConfig.Config["Data:ConnectionString"]);
+
+            if (AppConfig.EfDatabase != null)
+            {
+                csb.Database = AppConfig.EfDatabase;
+            }
+
+            return csb.ConnectionString;
+        }
+        */
+        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
