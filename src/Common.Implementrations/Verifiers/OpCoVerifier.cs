@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using PinPlatform.Common.Interfaces;
+using PinPlatform.Common.Repositories;
 using PinPlatform.Common.DataModels;
 
 namespace PinPlatform.Common.Verifiers

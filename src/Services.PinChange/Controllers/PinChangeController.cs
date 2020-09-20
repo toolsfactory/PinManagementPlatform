@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common;
 using PinPlatform.Common.DataModels;
-using PinPlatform.Common.Interfaces;
+using PinPlatform.Common.Repositories;
+using PinPlatform.Common.Verifiers;
 
 namespace PinPlatform.Services.PinChange.Controllers
 {
@@ -15,12 +16,14 @@ namespace PinPlatform.Services.PinChange.Controllers
         private readonly ILogger<PinChangeController> _logger;
         private readonly IOpCoVerifier _opCoVerifier;
         private readonly IPinChangeVerifier _pinChangeVerifier;
+        private readonly IPinRepository _pinRepository;
 
-        public PinChangeController(ILogger<PinChangeController> logger, IOpCoVerifier opCoVerifier, IPinChangeVerifier pinChangeVerifier)
+        public PinChangeController(ILogger<PinChangeController> logger, IOpCoVerifier opCoVerifier, IPinChangeVerifier pinChangeVerifier, IPinRepository pinRepository)
         {
             _logger = logger;
             _opCoVerifier = opCoVerifier;
             _pinChangeVerifier = pinChangeVerifier;
+            _pinRepository = pinRepository;
         }
 
         [HttpPost]
@@ -35,7 +38,9 @@ namespace PinPlatform.Services.PinChange.Controllers
             var pinChangeResult = _pinChangeVerifier.CheckNewPinAgainstRules(opcoid, request.PinType, request.NewPin);
             if (!pinChangeResult.Success)
                 return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinChangeResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(pinChangeResult.Error) });
-            
+
+            await _pinRepository.SetPinAsync(request.Requestor, request.PinType, request.NewPin);
+
             return Ok();
         }
     }

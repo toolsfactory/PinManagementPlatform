@@ -6,9 +6,8 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using PinPlatform.Common.Interfaces;
 
-namespace PinPlatform.Common.DataStores
+namespace PinPlatform.Common.Repositories
 {
     public class PinRulesConfigurationStore : IRulesConfiguratonStore, IAsyncInitializer
     {

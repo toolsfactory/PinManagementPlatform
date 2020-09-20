@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace PinPlatform.Common.Interfaces
+namespace PinPlatform.Common.Verifiers
 {
     public interface IPinHashVerifier
     {

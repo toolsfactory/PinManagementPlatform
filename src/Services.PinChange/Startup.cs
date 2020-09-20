@@ -6,11 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Initialization;
-using PinPlatform.Common.Interfaces;
+using PinPlatform.Common.Repositories;
 using PinPlatform.Common.Verifiers;
-using PinPlatform.Common.DataStores;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace PinPlatform.Services.PinChange
 {
@@ -37,9 +37,12 @@ namespace PinPlatform.Services.PinChange
             services.AddTransient<IOpCoVerifier, OpCoVerifier>();
 
             // Registering PinRulesConfigurationStore three times to ensure that one singleton can be access with both interfaces required
-            services.AddSingleton<PinRulesConfigurationStore>();
-            services.AddSingleton<IAsyncInitializer>(x => x.GetRequiredService<PinRulesConfigurationStore>());
-            services.AddSingleton<IRulesConfiguratonStore>(x => x.GetRequiredService<PinRulesConfigurationStore>());
+            services.AddSingleton<IAsyncInitializer, IRulesConfiguratonStore, PinRulesConfigurationStore>();
+
+            services.AddTransient<IPinRepository, PinRepository>();
+            services.AddEntityFrameworkMySql();
+            services.AddDbContextPool<PinPlatform.Common.DEMODBContext>(
+                options => options.UseMySql("server=db;port=3306;user=root;password=test123;database=DEMODB"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

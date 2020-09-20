@@ -1,7 +1,7 @@
 ﻿using PinPlatform.Common.DataModels;
 using System.Collections.Generic;
 
-namespace PinPlatform.Common.Interfaces
+namespace PinPlatform.Common.Repositories
 {
     public interface IRulesConfiguratonStore 
     {

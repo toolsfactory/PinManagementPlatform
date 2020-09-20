@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace PinPlatform.Common.Interfaces
+namespace PinPlatform.Common.Repositories
 {
-    public interface IPinDataStore
+    public interface IPinRepository
     {
         Task<(uint FailedAttemptsCount, DateTime LastFailedAttempt)> GetFailedVerificationsInfoAsync(DataModels.RequestorInfo requestor, uint? pinType);
         Task UpdateFailedVerificationsInfoAsync(DataModels.RequestorInfo requestor, uint? pinType, uint failedAtempts, DateTime lastFailed);
         Task DeleteFailedAttemptsInfoAsync(DataModels.RequestorInfo requestor, uint? pinType);
-        Task<string?> GetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType);
-        Task SetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType, string hash);
+        Task<string> GetPinHashAsync(DataModels.RequestorInfo requestor, uint? pinType);
+        Task SetPinAsync(DataModels.RequestorInfo requestor, uint? pinType, string hash);
     }
 }

@@ -24,8 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.Abstractions\Common.Abstractions.csproj" />
     <ProjectReference Include="..\Common.DataModels\Common.DataModels.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Common.Implementrations\Common.Implementrations.csproj" />
+    <ProjectReference Include="..\Common.Infrastructure\Common.Infrastructure.csproj" />
     <ProjectReference Include="..\Microsoft.Extensions.Hosting.Initialization\Microsoft.Extensions.Hosting.Initialization.csproj" />
   </ItemGroup>
 

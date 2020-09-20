@@ -6,13 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Initialization;
-using PinPlatform.Common.Interfaces;
 using PinPlatform.Common.Verifiers;
-using PinPlatform.Common.DataStores;
+using PinPlatform.Common.Repositories;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 
 namespace PinPlatform.Services.PinVerify
 {
@@ -38,30 +36,13 @@ namespace PinPlatform.Services.PinVerify
             services.AddTransient<IOpCoVerifier, OpCoVerifier>();
 
             // Registering PinRulesConfigurationStore three times to ensure that one singleton can be access with both interfaces required
-            services.AddSingleton<PinRulesConfigurationStore>();
-            services.AddSingleton<IAsyncInitializer>(x => x.GetRequiredService<PinRulesConfigurationStore>());
-            services.AddSingleton<IRulesConfiguratonStore>(x => x.GetRequiredService<PinRulesConfigurationStore>());
+            services.AddSingleton<IAsyncInitializer, IRulesConfiguratonStore, PinRulesConfigurationStore>();
 
-            services.AddTransient<IPinDataStore, PinDataStore>();
+            services.AddTransient<IPinRepository, PinRepository>();
             services.AddEntityFrameworkMySql();
             services.AddDbContextPool<PinPlatform.Common.DEMODBContext>(
                 options => options.UseMySql("server=db;port=3306;user=root;password=test123;database=DEMODB"));
-        }
-
-        /*
-        private static string GetConnectionString()
-        {
-            var csb = new MySqlConnectionStringBuilder(AppConfig.Config["Data:ConnectionString"]);
-
-            if (AppConfig.EfDatabase != null)
-            {
-                csb.Database = AppConfig.EfDatabase;
-            }
-
-            return csb.ConnectionString;
-        }
-        */
-        
+        }       
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -98,6 +79,7 @@ namespace PinPlatform.Services.PinVerify
                 endpoints.MapControllers();
             });
             app.UserRedisInformation();
+            //app.EnsureDatabaseCreated();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace PinPlatform.Common
     {
         public DEMODBContext(DbContextOptions<DEMODBContext> options)
             : base(options)
-        {
+        {            
         }
 
         public virtual DbSet<Pins> Pins { get; set; }

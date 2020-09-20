@@ -4,15 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using PinPlatform.Common.Interfaces;
 using System.Linq;
+using PinPlatform.Common.Repositories;
 
 namespace PinPlatform.Common.Verifiers
 {
     public class PinHashVerifier : IPinHashVerifier
     {
         private readonly ILogger<PinHashVerifier> _logger;
-        private readonly IPinDataStore _pinDataStore;
+        private readonly IPinRepository _pinDataStore;
 
         private uint? _pinType;
         private string? _storedPinHash = default;
@@ -21,7 +21,7 @@ namespace PinPlatform.Common.Verifiers
         public uint FailedAttemptsCount { get; private set; }
         public DateTime LastFailedAttempt { get; private set; }
 
-        public PinHashVerifier(ILogger<PinHashVerifier> logger, IPinDataStore pinDataStore)
+        public PinHashVerifier(ILogger<PinHashVerifier> logger, IPinRepository pinDataStore)
         {
             _logger = logger;
             _pinDataStore = pinDataStore;
@@ -46,7 +46,7 @@ namespace PinPlatform.Common.Verifiers
             if (!await LoadPinHashAsync())
                 return (false, ErrorCodes.NoPinHashFound);
 
-            if ((hash.Length == _storedPinHash!.Length ) && hash.Equals(_storedPinHash))
+            if ((hash.Length == _storedPinHash!.Length) && hash.Equals(_storedPinHash))
             {
                 await RemoveFailedAttemptsInfoAsync();
                 LogSuccessfulVerification();

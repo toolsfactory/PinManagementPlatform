@@ -1,6 +1,6 @@
 ﻿using PinPlatform.Common;
 
-namespace PinPlatform.Common.Interfaces
+namespace PinPlatform.Common.Verifiers
 {
     public interface IOpCoVerifier
     {

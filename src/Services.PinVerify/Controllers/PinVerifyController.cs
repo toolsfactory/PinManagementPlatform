@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common.DataModels;
-using PinPlatform.Common.Interfaces;
+using PinPlatform.Common.Verifiers;
 using PinPlatform.Common;
 
 namespace PinPlatform.Services.PinVerify.Controllers

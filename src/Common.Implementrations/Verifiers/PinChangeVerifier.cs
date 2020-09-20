@@ -1,4 +1,4 @@
-﻿using PinPlatform.Common.Interfaces;
+﻿using PinPlatform.Common.Repositories;
 
 namespace PinPlatform.Common.Verifiers
 {
@@ -13,7 +13,7 @@ namespace PinPlatform.Common.Verifiers
 
         public (bool Success, ErrorCodes Error) CheckNewPinAgainstRules(string opcoId, uint pinType, string newPin)
         {
-            throw new System.NotImplementedException();
+            return (true, ErrorCodes.NoError);
         }
     }
 }

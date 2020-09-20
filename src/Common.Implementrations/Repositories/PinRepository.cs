@@ -1,34 +1,32 @@
 ﻿using PinPlatform.Common.DataModels;
 using System.Threading.Tasks;
-using PinPlatform.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System.Text;
 using System;
-using Microsoft.Extensions.Hosting.Initialization;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 
-namespace PinPlatform.Common.DataStores
+namespace PinPlatform.Common.Repositories
 {
-    public class PinDataStore : IPinDataStore
+    public class PinRepository : IPinRepository
     {
         private const string FailedLastSuffix = "failed-last";
         private const string FailedCountSuffix = "failed-count";
         private const string HashSuffix = "hash";
 
-        private readonly ILogger<IPinDataStore> _logger;
+        private readonly ILogger<IPinRepository> _logger;
         private readonly IRedisCacheClient _redisClient;
         private readonly DEMODBContext _dbContext;
 
-        public PinDataStore(ILogger<IPinDataStore> logger, IRedisCacheClient redisClient, DEMODBContext dbContext)
+        public PinRepository(ILogger<IPinRepository> logger, IRedisCacheClient redisClient, DEMODBContext dbContext)
         {
             _logger = logger;
             _redisClient = redisClient;
             _dbContext = dbContext;
         }
 
-        #region IPinDataStore Implenetation
+        #region IPinDataStore Implementation
         public async Task DeleteFailedAttemptsInfoAsync(RequestorInfo requestor, uint? pinType)
         {
             var prefix = GenerateCachingPrefix(requestor, pinType);
@@ -46,30 +44,28 @@ namespace PinPlatform.Common.DataStores
 
         public async Task<string?> GetPinHashAsync(RequestorInfo requestor, uint? pinType)
         {
-            try
+            var prefix = GenerateCachingPrefix(requestor, pinType);
+            var hash = await _redisClient.Db0.GetAsync<string>(prefix + HashSuffix);
+            if (hash == null)
             {
-                var prefix = GenerateCachingPrefix(requestor, pinType);
-                var hash = await _redisClient.Db0.GetAsync<string>(prefix + HashSuffix);
-                if (hash == null)
+                var loaded = await _dbContext.Pins.FirstOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == pinType);
+                if (loaded != null)
                 {
-                    var loaded = await _dbContext.Pins.FirstOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == pinType);
-                    if (loaded != null)
-                    {
-                        await _redisClient.Db0.AddAsync(prefix + HashSuffix, loaded.PinHash);
-                        return loaded.PinHash;
-                    }
+                    await _redisClient.Db0.AddAsync(prefix + HashSuffix, loaded.PinHash);
+                    return loaded.PinHash;
                 }
-                return hash;
-            } catch (Exception ex)
-            {
-                throw ex;
             }
+            return hash;
         }
 
-        public async Task SetPinHashAsync(RequestorInfo requestor, uint? pinType, string hash)
+        public async Task SetPinAsync(RequestorInfo requestor, uint? pinType, string pin)
         {
+            var sha = SHA256.Create();
+            var loaded = await _dbContext.Pins.FirstOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == pinType);
+            loaded.PinHash = ByteArrayToString(sha.ComputeHash(Encoding.ASCII.GetBytes(loaded.PinSalt + pin)));
+            await _dbContext.SaveChangesAsync();
             var prefix = GenerateCachingPrefix(requestor, pinType);
-            await _redisClient.Db0.AddAsync(prefix + HashSuffix, hash);
+            await _redisClient.Db0.AddAsync(prefix + HashSuffix, loaded.PinHash);
         }
 
         public async Task UpdateFailedVerificationsInfoAsync(RequestorInfo requestor, uint? pinType, uint failedAttempts, DateTime lastFailed)
@@ -93,6 +89,14 @@ namespace PinPlatform.Common.DataStores
             sb.Append(pinType.HasValue ? pinType.Value.ToString() : "0");
             sb.Append("-");
             return sb.ToString();
+        }
+
+        public static string ByteArrayToString(byte[] ba)
+        {
+            StringBuilder hex = new StringBuilder(ba.Length * 2);
+            foreach (byte b in ba)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
         }
         #endregion
     }
