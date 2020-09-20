@@ -18,8 +18,6 @@ namespace PinPlatform.Common
                 entity.HasKey(e => new { e.HouseholdId, e.ProfileId, e.PinType })
                     .HasName("PRIMARY");
 
-                entity.ToTable("pins", "demodb");
-
                 entity.Property(e => e.HouseholdId)
                     .HasMaxLength(64)
                     .IsUnicode(false);
@@ -42,10 +40,6 @@ namespace PinPlatform.Common
                     .HasMaxLength(32)
                     .IsUnicode(false);
             });
-
-            OnModelCreatingPartial(modelBuilder);
         }
-
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

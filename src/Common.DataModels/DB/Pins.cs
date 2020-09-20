@@ -10,7 +10,7 @@ namespace PinPlatform.Common
         public int PinType { get; set; }
         public string PinSalt { get; set; }
         public string PinHash { get; set; }
-        public byte PinLocked { get; set; }
+        public bool PinLocked { get; set; }
         public string Comments { get; set; }
     }
 }

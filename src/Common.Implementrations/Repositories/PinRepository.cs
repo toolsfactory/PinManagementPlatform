@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
+using Common.Implementrations;
 
 namespace PinPlatform.Common.Repositories
 {
@@ -62,7 +63,7 @@ namespace PinPlatform.Common.Repositories
         {
             var sha = SHA256.Create();
             var loaded = await _dbContext.Pins.FirstOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == pinType);
-            loaded.PinHash = ByteArrayToString(sha.ComputeHash(Encoding.ASCII.GetBytes(loaded.PinSalt + pin)));
+            loaded.PinHash = sha.ComputeHash(Encoding.ASCII.GetBytes(loaded.PinSalt + pin)).ToHexString();
             await _dbContext.SaveChangesAsync();
             var prefix = GenerateCachingPrefix(requestor, pinType);
             await _redisClient.Db0.AddAsync(prefix + HashSuffix, loaded.PinHash);
@@ -89,14 +90,6 @@ namespace PinPlatform.Common.Repositories
             sb.Append(pinType.HasValue ? pinType.Value.ToString() : "0");
             sb.Append("-");
             return sb.ToString();
-        }
-
-        public static string ByteArrayToString(byte[] ba)
-        {
-            StringBuilder hex = new StringBuilder(ba.Length * 2);
-            foreach (byte b in ba)
-                hex.AppendFormat("{0:x2}", b);
-            return hex.ToString();
         }
         #endregion
     }

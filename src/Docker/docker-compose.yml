@@ -101,3 +101,18 @@ services:
     volumes:
       - ./.shares/PinVerifyService/log:/var/log/PinVerifyService
 
+  administrationservice:
+    image: ${DOCKER_REGISTRY-}servicesadministration
+    build:
+      context: ..
+      dockerfile: Services.Administration/Dockerfile
+    ports:
+    - 83:80
+    environment:
+      - EXCEPTIONLESS_URL=http://exceptionless:80
+      - EXCEPTIONLESS_APIKEY=nkBXORItJVsXkarjdLvRrxI2u7sfmx9xHByjx9Kp
+    depends_on:
+      - exceptionless
+      - redis
+    volumes:
+      - ./.shares/AdministrationService/log:/var/log/AdministrationService
