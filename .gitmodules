@@ -1,3 +1,9 @@
 [submodule "libs/Tiveria.Common"]
 	path = libs/Tiveria.Common
 	url = https://github.com/toolsfactory/Tiveria.Common.Standard.git
+[submodule "libs/Tiveria.Common.MSExtensions.DependencyInjection"]
+	path = libs/Tiveria.Common.MSExtensions.DependencyInjection
+	url = https://github.com/toolsfactory/Tiveria.Common.MSExtensions.DependencyInjection.git
+[submodule "libs/Tiveria.Common.MSExtensions.Hosting"]
+	path = libs/Tiveria.Common.MSExtensions.Hosting
+	url = https://github.com/toolsfactory/Tiveria.Common.MSExtensions.Hosting.git
