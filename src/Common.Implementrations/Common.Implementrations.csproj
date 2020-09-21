@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libs\Tiveria.Common.MSExtensions.Hosting\src\Tiveria.Common.MSExtensions.Hosting.csproj" />
     <ProjectReference Include="..\Common.Abstractions\Common.Abstractions.csproj" />
     <ProjectReference Include="..\Common.DataModels\Common.DataModels.csproj" />
-    <ProjectReference Include="..\Microsoft.Extensions.Hosting.Initialization\Microsoft.Extensions.Hosting.Initialization.csproj" />
   </ItemGroup>
 
 </Project>

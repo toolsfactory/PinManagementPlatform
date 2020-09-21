@@ -44,7 +44,6 @@ namespace Services.Administration.Controllers
             {
                 var results = _context.Database.ExecuteSqlRaw("SHOW TABLE STATUS FROM `DEMODB`");
                 Console.WriteLine(results);
-                Console.WriteLine(results.First());
             }
             return Ok(new { Available = available, Count = pins });
         }

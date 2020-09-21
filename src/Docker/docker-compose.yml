@@ -43,21 +43,19 @@ services:
       - Logging:LogLevel:Default=Information
       - Logging:Loglevel:Microsoft=Warning
       - Logging:LogLevel:HealthChecks=Warning
-      - HealthChecksUI:HealthChecks:0:Name=PinChangeService
-      - HealthChecksUI:HealthChecks:0:Uri=http://pinchangeservice/healthz
-      - HealthChecksUI:HealthChecks:1:Name=PinVerifyService
-      - HealthChecksUI:HealthChecks:1:Uri=http://pinverifyservice/healthz
-      - HealthChecksUI:HealthChecks:2:Name=PinSettingsService
-      - HealthChecksUI:HealthChecks:2:Uri=http://pinsettingsservice/healthz
+      - HealthChecksUI:HealthChecks:0:Name=ClientApiService
+      - HealthChecksUI:HealthChecks:0:Uri=http://clientapiservice/healthz
+      - HealthChecksUI:HealthChecks:1:Name=ProvisioningApiService
+      - HealthChecksUI:HealthChecks:1:Uri=http://provisioningapiservice/healthz
+      - HealthChecksUI:HealthChecks:2:Name=PoCAdministrationApiService
+      - HealthChecksUI:HealthChecks:2:Uri=http://administrationservice/healthz
 
 
-
-
-  pinchangeservice:
-    image: ${DOCKER_REGISTRY-}servicespinchange
+  clientapiservice:
+    image: ${DOCKER_REGISTRY-}services-clientapi
     build:
-      context: .
-      dockerfile: ../Services.PinChange/Dockerfile
+      context: ..
+      dockerfile: Services.ClientAPI/Dockerfile
     ports:
     - 80:80
     environment:
@@ -67,13 +65,13 @@ services:
       - exceptionless
       - redis
     volumes:
-      - ./.shares/PinChangeService/log:/var/log/PinChangeService
+      - ./.shares/ClientApiService/log:/var/log/ClientApiervice
 
-  pinsettingsservice:
-    image: ${DOCKER_REGISTRY-}servicespinsettings
+  provisioningapiservice:
+    image: ${DOCKER_REGISTRY-}provisioningapiservice
     build:
       context: ..
-      dockerfile: Services.PinSettings/Dockerfile
+      dockerfile: Services.ProvisioningAPI/Dockerfile
     ports:
     - 81:80
     environment:
@@ -83,23 +81,7 @@ services:
       - exceptionless
       - redis
     volumes:
-      - ./.shares/PinSettingsService/log:/var/log/PinChangeService
-
-  pinverifyservice:
-    image: ${DOCKER_REGISTRY-}servicespinverify
-    build:
-      context: ..
-      dockerfile: Services.PinVerify/Dockerfile
-    ports:
-    - 82:80
-    environment:
-      - EXCEPTIONLESS_URL=http://exceptionless:80
-      - EXCEPTIONLESS_APIKEY=nkBXORItJVsXkarjdLvRrxI2u7sfmx9xHByjx9Kp
-    depends_on:
-      - exceptionless
-      - redis
-    volumes:
-      - ./.shares/PinVerifyService/log:/var/log/PinVerifyService
+      - ./.shares/provisioningapiservice/log:/var/log/provisioningapiservice
 
   administrationservice:
     image: ${DOCKER_REGISTRY-}servicesadministration
@@ -107,7 +89,7 @@ services:
       context: ..
       dockerfile: Services.Administration/Dockerfile
     ports:
-    - 83:80
+    - 89:80
     environment:
       - EXCEPTIONLESS_URL=http://exceptionless:80
       - EXCEPTIONLESS_APIKEY=nkBXORItJVsXkarjdLvRrxI2u7sfmx9xHByjx9Kp

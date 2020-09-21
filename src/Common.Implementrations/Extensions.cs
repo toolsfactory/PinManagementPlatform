@@ -31,6 +31,5 @@ namespace Common.Implementrations
             }
             return result.ToString();
         }
-
     }
 }
