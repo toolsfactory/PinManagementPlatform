@@ -40,7 +40,7 @@ namespace PinPlatform.Services.ClientApi.Controllers
             return await HandleChangeRequestAsync(requestor, request.PinType, request.NewPin);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("v1/{opcoid}/{householdid}/{profileid}/pin/{pintype}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesErrorResponseType(typeof(ErrorResponseModel))]

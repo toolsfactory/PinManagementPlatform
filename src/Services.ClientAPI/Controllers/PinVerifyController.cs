@@ -32,8 +32,9 @@ namespace PinPlatform.Services.ClientApi.Controllers
         [HttpPost]
         [Route("v1/{opcoid}/pin/verify")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ErrorResponseModel))]
-        public async Task<IActionResult> GetVerifyPinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinVerifyRequestModel request)
+        [ProducesErrorResponseType(typeof(ApiResponse))]
+        [FormatFilter]
+        public async Task<ActionResult<ApiResponse>> GetVerifyPinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinVerifyRequestModel request)
         {
             var requestor = _mapper.Map<RequestorInfo>(request.Requestor);
             requestor.OpCoId = opcoid;
@@ -41,10 +42,10 @@ namespace PinPlatform.Services.ClientApi.Controllers
         }
 
         [HttpGet]
-        [Route("v1/{opcoid}/{householdid}/{profileid}/pin/{pintype}/verify")]
+        [Route("v1/{opcoid}/{householdid}/{profileid}/pins/{pintype}/verify")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ErrorResponseModel))]
-        public async Task<IActionResult> GetVerifyPinAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromRoute] uint pintype, [FromQuery] string pinhash)
+        [ProducesErrorResponseType(typeof(ApiResponse))]
+        public async Task<ActionResult<ApiResponse>> GetVerifyPinAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromRoute] uint pintype, [FromQuery] string pinhash)
         {
             var requestor = new RequestorInfo() { HouseholdId = householdid, ProfileId = profileid, OpCoId = opcoid };
             return await HandleVerifyRequestAsync(requestor, pintype, pinhash);
@@ -53,26 +54,25 @@ namespace PinPlatform.Services.ClientApi.Controllers
         [HttpPost]
         [Route("v1/{opcoid}/{householdid}/{profileid}/pin/verify")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ErrorResponseModel))]
-        public async Task<IActionResult> PostVerifyPinAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromBody] PinHashModel pinDetails)
+        [ProducesErrorResponseType(typeof(ApiResponse))]
+        public async Task<ActionResult<ApiResponse>> PostVerifyPinAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromBody] PinHashModel pinDetails)
         {
             var requestor = new RequestorInfo() { HouseholdId = householdid, ProfileId = profileid, OpCoId = opcoid };
             return await HandleVerifyRequestAsync(requestor, pinDetails.PinType, pinDetails.PinHash);
         }
 
 
-        private async Task<IActionResult> HandleVerifyRequestAsync(RequestorInfo requestor, uint pintype, string hash)
+        private async Task<ActionResult<ApiResponse>> HandleVerifyRequestAsync(RequestorInfo requestor, uint pintype, string hash)
         {
             var opcoVerifyResult = _opCoVerifier.CheckIfOpCoHasPinService(requestor.OpCoId);
             if (!opcoVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(opcoVerifyResult.Error) });
+                return BadRequest(new ApiResponse(StatusCodes.Status400BadRequest, opcoVerifyResult.Error.ToString(), this.HttpContext.TraceIdentifier, ErrorTexts.GetTextForErrorCode(opcoVerifyResult.Error)));
 
             var pinVerifyResult = await _pinCheckVerifier.VerifyPinHashAsync(requestor, pintype, hash);
             if (!pinVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinVerifyResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(pinVerifyResult.Error) });
+                return BadRequest(new ApiResponse(StatusCodes.Status400BadRequest, opcoVerifyResult.Error.ToString(), this.HttpContext.TraceIdentifier, ErrorTexts.GetTextForErrorCode(opcoVerifyResult.Error)));
 
             return Ok();
         }
-
     }
 }
