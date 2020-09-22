@@ -11,5 +11,4 @@ namespace PinPlatform.Services.ClientApi.DataModel
         [StringLength(64, MinimumLength = 64)]
         public string PinHash { get; set; } = String.Empty;
     }
-
 }

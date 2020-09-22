@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace PinPlatform.Services.ClientApi.DataModel
 {
-
     public class PinChangeRequestModel
     {
         [Required]
@@ -17,5 +16,4 @@ namespace PinPlatform.Services.ClientApi.DataModel
         [StringLength(16, MinimumLength = 4)]
         public string NewPin { get; set; } = String.Empty;
     }
-
 }

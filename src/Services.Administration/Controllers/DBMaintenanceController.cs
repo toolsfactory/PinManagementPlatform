@@ -82,9 +82,9 @@ namespace Services.Administration.Controllers
             var available = _context.Database.CanConnect();
             if (available)
             {
-                await CreateRecordsAsync(records);
+                var count = await CreateRecordsAsync(records);
 
-                return Ok();
+                return Ok(new { Count = count });
             }
             return this.BadRequest();
         }
@@ -113,7 +113,7 @@ namespace Services.Administration.Controllers
             return this.Ok();
         }
 
-        private async Task CreateRecordsAsync(int records)
+        private async Task<int> CreateRecordsAsync(int records)
         {
             var pins = new Pins[records];
             var rand = new Random();
@@ -137,7 +137,7 @@ namespace Services.Administration.Controllers
                 };
             }
             await _context.AddRangeAsync(pins);
-            await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
     }
 }
