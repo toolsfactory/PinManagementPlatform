@@ -7,6 +7,11 @@ namespace Common.Implementrations
 {
     public class PinCacheKeyGenerator : IPinCacheKeyGenerator
     {
+        public string GenerateKeyBase(string opcoId)
+        {
+            return $"{opcoId}-PIN_";
+        }
+
         public string GenerateKeyForHash(RequestorInfo requestor, uint? pinType)
         {
             pinType = pinType ?? 0;

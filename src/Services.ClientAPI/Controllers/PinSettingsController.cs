@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common;
 using PinPlatform.Common.DataModels;
-using PinPlatform.Common.Verifiers;
+using PinPlatform.Domain.Verifiers;
 using PinPlatform.Services.ClientApi.DataModel;
 
 namespace PinPlatform.Services.ClientApi.Controllers

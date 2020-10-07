@@ -65,7 +65,7 @@ services:
       - exceptionless
       - redis
     volumes:
-      - ./.shares/ClientApiService/log:/var/log/ClientApiervice
+      - ./.shares/ClientApiService/log:/var/log/ClientApiService
 
   provisioningapiservice:
     image: ${DOCKER_REGISTRY-}provisioningapiservice

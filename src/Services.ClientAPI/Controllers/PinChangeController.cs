@@ -5,8 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common;
 using PinPlatform.Common.DataModels;
-using PinPlatform.Common.Repositories;
-using PinPlatform.Common.Verifiers;
+using PinPlatform.Domain.Processors;
+using PinPlatform.Domain.Repositories;
+using PinPlatform.Domain.Verifiers;
 using PinPlatform.Services.ClientApi.DataModel;
 
 namespace PinPlatform.Services.ClientApi.Controllers
@@ -15,53 +16,45 @@ namespace PinPlatform.Services.ClientApi.Controllers
     public class PinChangeController : ControllerBase
     {
         private readonly ILogger<PinChangeController> _logger;
-        private readonly IOpCoVerifier _opCoVerifier;
-        private readonly IPinChangeVerifier _pinChangeVerifier;
-        private readonly IPinRepository _pinRepository;
+        private readonly IChangePinProcessor _pinChangeProcessor;
         private readonly IMapper _mapper;
 
-        public PinChangeController(ILogger<PinChangeController> logger, IOpCoVerifier opCoVerifier, IPinChangeVerifier pinChangeVerifier, IPinRepository pinRepository, IMapper mapper)
+        public PinChangeController(ILogger<PinChangeController> logger,IChangePinProcessor pinChangeProcessor, IMapper mapper)
         {
             _logger = logger;
-            _opCoVerifier = opCoVerifier;
-            _pinChangeVerifier = pinChangeVerifier;
-            _pinRepository = pinRepository;
+            this._pinChangeProcessor = pinChangeProcessor;
         }
 
         [HttpPost]
         [Route("v1/{opcoid}/pin")]
         [Route("v1/{opcoid}/pin/change")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ErrorResponseModel))]
         public async Task<IActionResult> PostChangePinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinChangeRequestModel request)
         {
-            var requestor = _mapper.Map<RequestorInfo>(request.Requestor);
-            requestor.OpCoId = opcoid;
-            return await HandleChangeRequestAsync(requestor, request.PinType, request.NewPin);
+            var data = new ChangePinParameters()
+            {
+                Requestor = new Domain.Models.RequestorModel() { HouseholdId = request.Requestor.HouseholdId, ProfileId = request.Requestor.ProfileId, OpCoId = opcoid },
+                PinType = request.PinType,
+                OldPinHash = request.OldPinHash,
+                NewPin = request.NewPin
+            };
+            await _pinChangeProcessor.ProcessRequestAsync(data);
+            return Ok();
         }
 
         [HttpPost]
         [Route("v1/{opcoid}/{householdid}/{profileid}/pin/{pintype}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ErrorResponseModel))]
         public async Task<IActionResult> PostChangePinAltAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromRoute] uint pintype, [FromBody] PinChangeModel pindetails)
         {
-            var requestor = new RequestorInfo() { HouseholdId = householdid, ProfileId = profileid, OpCoId = opcoid };
-            return await HandleChangeRequestAsync(requestor, pintype, pindetails.NewPin);
-        }
-
-        private async Task<IActionResult> HandleChangeRequestAsync(RequestorInfo requestor, uint pintype, string newpin)
-        { 
-            var opcoVerifyResult = _opCoVerifier.CheckIfOpCoHasPinService(requestor.OpCoId);
-            if (!opcoVerifyResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)opcoVerifyResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(opcoVerifyResult.Error) });
-
-            var pinChangeResult = _pinChangeVerifier.CheckNewPinAgainstRules(requestor.OpCoId, pintype, newpin);
-            if (!pinChangeResult.Success)
-                return BadRequest(new ErrorResponseModel() { ErrorCode = (int)pinChangeResult.Error, ErrorText = ErrorTexts.GetTextForErrorCode(pinChangeResult.Error) });
-
-            await _pinRepository.SetPinAsync(requestor, pintype, newpin);
-
+            var data = new ChangePinParameters()
+            {
+                Requestor = new Domain.Models.RequestorModel() { HouseholdId = householdid, ProfileId = profileid, OpCoId = opcoid },
+                PinType = pintype,
+                OldPinHash = pindetails.OldPinHash,
+                NewPin = pindetails.NewPin
+            };
+            await _pinChangeProcessor.ProcessRequestAsync(data);
             return Ok();
         }
     }

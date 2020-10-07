@@ -6,18 +6,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.8">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.0" />
-    <PackageReference Include="StackExchange.Redis.Extensions.Core" Version="6.3.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\libs\Tiveria.Common.MSExtensions.Hosting\src\Tiveria.Common.MSExtensions.Hosting.csproj" />
+    <ProjectReference Include="..\..\libs\Tiveria.Common\src\Tiveria.Common\Tiveria.Common.csproj" />
     <ProjectReference Include="..\Common.Abstractions\Common.Abstractions.csproj" />
     <ProjectReference Include="..\Common.DataModels\Common.DataModels.csproj" />
+    <ProjectReference Include="..\Common.Infrastructure\Common.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

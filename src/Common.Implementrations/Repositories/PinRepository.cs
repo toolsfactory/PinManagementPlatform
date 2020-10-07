@@ -6,7 +6,7 @@ using System.Text;
 using System;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
-using Common.Implementrations;
+using Tiveria.Common.Extensions;
 
 namespace PinPlatform.Common.Repositories
 {

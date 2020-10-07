@@ -2,7 +2,7 @@
 
 namespace PinPlatform.Common
 {
-    public enum ErrorCodes : ushort
+    public enum ErrorCodes : int
     {
         NoError = 0,
         ParameterMissing = 1,

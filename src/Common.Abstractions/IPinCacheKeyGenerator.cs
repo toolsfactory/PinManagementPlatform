@@ -2,7 +2,7 @@
 {
     public interface IPinCacheKeyGenerator
     {
-        string GenerateKeyForHash(DataModels.RequestorInfo requestor, uint? pinType);
-        string GenerateKeyForVerificationFailures(DataModels.RequestorInfo requestor, uint? pinType);
+        string GenerateKeyBase(string opcoId);
+        string GenerateKeyForPin(string opcoid, string householdid, uint profileid, uint? pinType);
     }
 }

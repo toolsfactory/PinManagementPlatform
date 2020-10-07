@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Exceptionless;
@@ -15,6 +16,7 @@ namespace PinPlatform.Services.ClientAPI
     {
         public static void Main(string[] args)
         {
+            Activity.DefaultIdFormat = ActivityIdFormat.W3C;
             var exceptionless_url = Environment.GetEnvironmentVariable("EXCEPTIONLESS_URL");
             var exceptionless_apikey = Environment.GetEnvironmentVariable("EXCEPTIONLESS_APIKEY");
             var loggerconfig = new LoggerConfiguration()
