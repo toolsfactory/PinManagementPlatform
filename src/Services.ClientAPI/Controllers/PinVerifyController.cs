@@ -6,8 +6,6 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PinPlatform.Common;
-using PinPlatform.Common.DataModels;
 using PinPlatform.Domain.Processors;
 using PinPlatform.Services.ClientApi.DataModel;
 
@@ -30,8 +28,7 @@ namespace PinPlatform.Services.ClientApi.Controllers
         [HttpPost]
         [Route("v1/{opcoid}/pin/verify")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [FormatFilter]
-        public async Task<ActionResult<ApiResponse>> GetVerifyPinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinVerifyRequestModel request)
+        public async Task<ActionResult> GetVerifyPinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinVerifyRequestModel request)
         {
             var data = new Domain.Processors.VerifyPinParameters()
             {

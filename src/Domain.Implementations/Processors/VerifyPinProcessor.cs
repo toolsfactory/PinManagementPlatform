@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using PinPlatform.Domain.Models;
 using PinPlatform.Domain.Verifiers;
 using System;
 using System.Threading.Tasks;

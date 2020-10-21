@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["Services.Administration/Services.Administration.csproj", "Services.Administration/"]
-RUN dotnet restore "Services.Administration/Services.Administration.csproj"
+COPY ["Services.AdminAPI/Services.AdminAPI.csproj", "Services.AdminAPI/"]
+RUN dotnet restore "Services.AdminAPI/Services.AdminAPI.csproj"
 COPY . .
-WORKDIR "/src/Services.Administration"
-RUN dotnet build "Services.Administration.csproj" -c Release -o /app/build
+WORKDIR "/src/Services.AdminAPI"
+RUN dotnet build "Services.AdminAPI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Services.Administration.csproj" -c Release -o /app/publish
+RUN dotnet publish "Services.AdminAPI.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Services.Administration.dll"]
+ENTRYPOINT ["dotnet", "Services.AdminAPI.dll"]

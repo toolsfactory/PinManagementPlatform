@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common;
-using PinPlatform.Common.DataModels;
+using PinPlatform.Domain.Processors;
 using PinPlatform.Domain.Verifiers;
 using PinPlatform.Services.ClientApi.DataModel;
 
@@ -17,44 +17,42 @@ namespace PinPlatform.Services.ClientApi.Controllers
     public class PinSettingsController : ControllerBase
     {
         private readonly ILogger<PinVerifyController> _logger;
-        private readonly IPinHashVerifier _pinCheckVerifier;
-        private readonly IOpCoVerifier _opCoVerifier;
-        private readonly IMapper _mapper;
+        private readonly IPinSettingsProcessor _processor;
 
-        public PinSettingsController(ILogger<PinVerifyController> logger, IPinHashVerifier pinCheckVerifier, IOpCoVerifier opCoVerifier, IMapper mapper)
+        public PinSettingsController(ILogger<PinVerifyController> logger, IPinSettingsProcessor processor)
         {
             _logger = logger;
-            _pinCheckVerifier = pinCheckVerifier;
-            _opCoVerifier = opCoVerifier;
-            _mapper = mapper;
+            _processor = processor;
         }
 
         [HttpPost]
         [Route("v1/{opcoid}/pin/settings")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ApiResponse))]
-        [FormatFilter]
-        public async Task<ActionResult<ApiResponse>> GetPinSettingsAsync([FromRoute] string opcoid, [FromBody] DataModel.RequestorModel requestor)
+        public async Task<ActionResult> GetPinSettingsAsync([FromRoute] string opcoid, [FromBody] DataModel.RequestorModel requestor)
         {
-            var req = _mapper.Map<RequestorInfo>(requestor);
-            req.OpCoId = opcoid;
-            return await HandleSettingsRequestAsync(req);
+            var req = new Domain.Models.RequestorModel()
+            {
+                OpCoId = opcoid,
+                HouseholdId = requestor.HouseholdId,
+                ProfileId = requestor.ProfileId
+            };
+            var result = await _processor.ProcessRequestAsync(req);
+            return Ok(result);
         }
 
         [HttpGet]
         [Route("v1/{opcoid}/{householdid}/{profileid}/pins")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesErrorResponseType(typeof(ApiResponse))]
-        public async Task<ActionResult<ApiResponse>> GetPinSettingsAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid)
+        public async Task<ActionResult> GetPinSettingsAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid)
         {
-            var req = new RequestorInfo() { OpCoId = opcoid, HouseholdId = householdid, ProfileId = profileid };
-            return await HandleSettingsRequestAsync(req);
-        }
-
-
-        private async Task<ActionResult<ApiResponse>> HandleSettingsRequestAsync(RequestorInfo req)
-        {
-            return Ok("settings");
+            var req = new Domain.Models.RequestorModel()
+            {
+                OpCoId = opcoid,
+                HouseholdId = householdid,
+                ProfileId = profileid
+            };
+            var result = await _processor.ProcessRequestAsync(req);
+            return Ok(result);
         }
     }
 }

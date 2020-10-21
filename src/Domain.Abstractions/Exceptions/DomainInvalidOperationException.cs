@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace PinPlatform.Common.Exceptions
+namespace PinPlatform.Domain.Exceptions
 {
     public class DomainInvalidOperationException : DomainException
     {

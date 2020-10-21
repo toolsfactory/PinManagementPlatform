@@ -5,6 +5,7 @@ namespace PinPlatform.Domain.Infrastructure.DB
 {
     public partial class Pins
     {
+        public string OpcoId { get; set; }
         public string HouseholdId { get; set; }
         public uint ProfileId { get; set; }
         public uint PinType { get; set; }

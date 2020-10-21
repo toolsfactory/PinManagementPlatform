@@ -11,10 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 		..\LICENSE = ..\LICENSE
 		..\Readme.md = ..\Readme.md
-		redis\redis.conf = redis\redis.conf
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common.DataModels", "Common.DataModels\Common.DataModels.csproj", "{32A19F29-979D-4807-9417-8D3E488E903C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FA7E3BA8-E076-4ED6-8621-49E7A52E4103}"
 EndProject
@@ -44,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Implementations", "D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain.Infrastructure", "Domain.Infrastructure\Domain.Infrastructure.csproj", "{0463E140-2029-408E-931B-B4FFAA23FCC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.Infrastructure", "Services.Infrastructure\Services.Infrastructure.csproj", "{87032F2D-C866-40A9-9FC3-7DD6D08B8F2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services.Infrastructure", "Services.Infrastructure\Services.Infrastructure.csproj", "{87032F2D-C866-40A9-9FC3-7DD6D08B8F2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,12 +56,6 @@ Global
 		{D25B475B-CB9C-4E5C-9A7A-7913FFC17DC3}.Release Linux|Any CPU.Build.0 = Release|Any CPU
 		{D25B475B-CB9C-4E5C-9A7A-7913FFC17DC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D25B475B-CB9C-4E5C-9A7A-7913FFC17DC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{32A19F29-979D-4807-9417-8D3E488E903C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{32A19F29-979D-4807-9417-8D3E488E903C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{32A19F29-979D-4807-9417-8D3E488E903C}.Release Linux|Any CPU.ActiveCfg = Release|Any CPU
-		{32A19F29-979D-4807-9417-8D3E488E903C}.Release Linux|Any CPU.Build.0 = Release|Any CPU
-		{32A19F29-979D-4807-9417-8D3E488E903C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{32A19F29-979D-4807-9417-8D3E488E903C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E5A723E9-FEE6-4B16-9A0C-9DAE0773A249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E5A723E9-FEE6-4B16-9A0C-9DAE0773A249}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5A723E9-FEE6-4B16-9A0C-9DAE0773A249}.Release Linux|Any CPU.ActiveCfg = Release|Any CPU
@@ -143,7 +134,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D25B475B-CB9C-4E5C-9A7A-7913FFC17DC3} = {FA7E3BA8-E076-4ED6-8621-49E7A52E4103}
-		{32A19F29-979D-4807-9417-8D3E488E903C} = {DDDE215C-C0C5-4BE2-8602-1B4DC3696140}
 		{E5A723E9-FEE6-4B16-9A0C-9DAE0773A249} = {DDDE215C-C0C5-4BE2-8602-1B4DC3696140}
 		{0E74410B-B1F7-42FC-8CED-ABCA6F626450} = {DDDE215C-C0C5-4BE2-8602-1B4DC3696140}
 		{2F75B6D8-AFC3-4B74-ADAB-1851BD750A2A} = {DDDE215C-C0C5-4BE2-8602-1B4DC3696140}

@@ -1,7 +1,4 @@
-﻿using PinPlatform.Common;
-using PinPlatform.Common.Exceptions;
-
-namespace PinPlatform.Domain.Exceptions
+﻿namespace PinPlatform.Domain.Exceptions
 {
     public class PinVerificationWithinGracePeriodException : DomainInvalidOperationException
     {

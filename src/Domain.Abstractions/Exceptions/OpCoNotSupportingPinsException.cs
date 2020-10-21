@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using PinPlatform.Common.Exceptions;
-
-namespace PinPlatform.Domain.Exceptions
+﻿namespace PinPlatform.Domain.Exceptions
 {
     public class OpCoNotSupportingPinsException : DomainInvalidOperationException
     {
-        public OpCoNotSupportingPinsException() : base(Common.ErrorCodes.OpCoWithoutPins)
+        public OpCoNotSupportingPinsException() : base(ErrorCodes.OpCoWithoutPins)
         {
         }
     }

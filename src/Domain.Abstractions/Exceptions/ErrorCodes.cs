@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PinPlatform.Common
+namespace PinPlatform.Domain.Exceptions
 {
     public enum ErrorCodes : int
     {

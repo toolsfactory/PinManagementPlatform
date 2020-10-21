@@ -34,6 +34,7 @@ namespace PinPlatform.Domain.Infrastructure
             if(found is null)
                 found = new Pins()
                 {
+                    OpcoId = requestor.OpCoId,
                     HouseholdId = requestor.HouseholdId,
                     ProfileId = requestor.ProfileId,
                     PinType = requestor.PinType.Value
@@ -49,7 +50,6 @@ namespace PinPlatform.Domain.Infrastructure
 
             var key = _cacheKeyGenerator.GenerateKeyForPin(requestor.OpCoId, requestor.HouseholdId, requestor.ProfileId, requestor.PinType);
             _redisClient.Db0.Database.StringSet(key, SerializePinModel(pin));
-           // await _redisClient.Db0.SetAddAsync(key, pin);
         }
 
         public async Task DeletePinAsync(RequestorModel requestor)
@@ -60,6 +60,7 @@ namespace PinPlatform.Domain.Infrastructure
             await _redisClient.Db0.RemoveAsync(key);
             var dbitem = new Pins()
             {
+                OpcoId = requestor.OpCoId,
                 HouseholdId = requestor.HouseholdId, 
                 ProfileId = requestor.ProfileId, 
                 PinType = requestor.PinType.Value
@@ -72,15 +73,13 @@ namespace PinPlatform.Domain.Infrastructure
         {
             PinModel model = default;
             var key = _cacheKeyGenerator.GenerateKeyForPin(requestor.OpCoId, requestor.HouseholdId, requestor.ProfileId, requestor.PinType);
-            //var model = await _redisClient.Db0.GetAsync<PinModel>(key);
-        
+
             var cache = _redisClient.Db0.Database.StringGet(key);
             if (cache.HasValue)
                 model = DeSerializePinModel(cache.ToString());
             else
-            //if (model == null)
             {
-                var loaded = await _dbContext.Pins.SingleOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == requestor.PinType);
+                var loaded = await _dbContext.Pins.SingleOrDefaultAsync(x => x.OpcoId == requestor.OpCoId && x.HouseholdId == requestor.HouseholdId && x.ProfileId == requestor.ProfileId && x.PinType == requestor.PinType);
                 if (loaded != null)
                 {
                     model = new PinModel()
@@ -91,7 +90,6 @@ namespace PinPlatform.Domain.Infrastructure
                         FailedAttemptsCount = 0,
                         LastFailedAttempt = DateTime.MinValue
                     };
-                    //await _redisClient.Db0.SetAddAsync(key, model);
                     _redisClient.Db0.Database.StringSet(key, SerializePinModel(model));
                 }
             }
@@ -102,7 +100,6 @@ namespace PinPlatform.Domain.Infrastructure
         {
             var key = _cacheKeyGenerator.GenerateKeyForPin(requestor.OpCoId, requestor.HouseholdId, requestor.ProfileId, requestor.PinType);
             await _redisClient.Db0.Database.StringSetAsync(key, SerializePinModel(pin));
-            //await _redisClient.Db0.SetAddAsync(key, pin);
         }
 
         private string SerializePinModel(PinModel pin)

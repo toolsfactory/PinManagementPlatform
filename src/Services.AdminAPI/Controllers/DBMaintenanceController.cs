@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common;
-using PinPlatform.Common.DataModels;
 using PinPlatform.Domain.Infrastructure.DB;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using Tiveria.Common.Extensions;
@@ -144,9 +143,10 @@ namespace PinPlatform.Services.Administration.Controllers
                 salt = rand.NextString(32);
                 pins[i] = new Pins()
                 {
+                    OpcoId = "vfde",
                     HouseholdId = Guid.NewGuid().ToString(),
                     ProfileId = (uint) rand.Next(0, 5),
-                    PinType = (uint) rand.Next(0, 3),
+                    PinType = (uint) rand.Next(0, 2),
                     PinLocked = (rand.Next(0, 99) > 50),
                     PinSalt = salt,
                     Comments = pin,

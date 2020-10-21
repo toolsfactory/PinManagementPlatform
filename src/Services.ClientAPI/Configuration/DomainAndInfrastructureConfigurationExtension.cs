@@ -18,6 +18,7 @@ namespace PinPlatform.Services.ClientAPI.Configuration
             services.AddTransient<IPinChangeVerifier, PinChangeVerifier>();
             services.AddTransient<IVerifyPinProcessor, VerifyPinProcessor>();
             services.AddTransient<IChangePinProcessor, ChangePinProcessor>();
+            services.AddTransient<IPinSettingsProcessor, PinSettingsProcessor>();
             services.AddSingleton<IPinHashGenerator, PinHashGenerator>();
             services.AddSingleton<IPinCacheKeyGenerator, PinCacheKeyGenerator>();
             services.AddTransient<IPinRepository, PinRepository>();

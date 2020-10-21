@@ -1,5 +1,4 @@
 ﻿using PinPlatform.Common;
-using PinPlatform.Common.Exceptions;
 
 namespace PinPlatform.Domain.Exceptions
 {

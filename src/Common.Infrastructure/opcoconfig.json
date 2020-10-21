@@ -1,0 +1,98 @@
+{
+  "opcos": {
+    "opcos": [
+      {
+        "id": "vfde",
+        "name": "Vodafone Germany",
+        "defaultPinType": 0,
+        "pinTypes": [
+          {
+            "id": 0,
+            "name": "Household Pin",
+            "minLength": 4,
+            "maxLength": 4,
+            "validationRules": [
+              {
+                "minErrors": 1,
+                "maxErrors": 3,
+                "validationMode": 1,
+                "gracePeriodSec": 5
+              },
+              {
+                "minErrors": 4,
+                "maxErrors": 6,
+                "validationMode": 2,
+                "gracePeriodSec": 10
+              },
+              {
+                "minErrors": 7,
+                "maxErrors": 65535,
+                "validationMode": 2,
+                "gracePeriodSec": 15
+              }
+            ]
+          },
+          {
+            "id": 1,
+            "name": "Parental Pin",
+            "minLength": 4,
+            "maxLength": 4,
+            "validationRules": [
+              {
+                "minErrors": 1,
+                "maxErrors": 3,
+                "validationMode": 1,
+                "gracePeriodSec": 5
+              },
+              {
+                "minErrors": 4,
+                "maxErrors": 6,
+                "validationMode": 2,
+                "gracePeriodSec": 10
+              },
+              {
+                "minErrors": 7,
+                "maxErrors": 65535,
+                "validationMode": 2,
+                "gracePeriodSec": 15
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "vfuk",
+        "name": "Vodafone UK",
+        "defaultPinType": 0,
+        "pinTypes": [
+          {
+            "id": 1,
+            "name": "Household Pin",
+            "minLength": 4,
+            "maxLength": 4,
+            "validationRules": [
+              {
+                "minErrors": 1,
+                "maxErrors": 3,
+                "validationMode": 1,
+                "gracePeriodSec": 5
+              },
+              {
+                "minErrors": 4,
+                "maxErrors": 6,
+                "validationMode": 2,
+                "gracePeriodSec": 10
+              },
+              {
+                "minErrors": 7,
+                "maxErrors": 65535,
+                "validationMode": 2,
+                "gracePeriodSec": 15
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

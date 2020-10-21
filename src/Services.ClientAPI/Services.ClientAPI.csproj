@@ -33,7 +33,6 @@
     <ProjectReference Include="..\..\libs\Tiveria.Common.MSExtensions.DependencyInjection\src\Tiveria.Common.MSExtensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\libs\Tiveria.Common.MSExtensions.Hosting\src\Tiveria.Common.MSExtensions.Hosting.csproj" />
     <ProjectReference Include="..\Common.Abstractions\Common.Abstractions.csproj" />
-    <ProjectReference Include="..\Common.DataModels\Common.DataModels.csproj" />
     <ProjectReference Include="..\Common.Infrastructure\Common.Infrastructure.csproj" />
     <ProjectReference Include="..\Domain.Abstractions\Domain.Abstractions.csproj" />
     <ProjectReference Include="..\Domain.Implementations\Domain.Implementations.csproj" />

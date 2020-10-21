@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Common;
-using PinPlatform.Common.DataModels;
 using PinPlatform.Domain.Processors;
 using PinPlatform.Domain.Repositories;
 using PinPlatform.Domain.Verifiers;

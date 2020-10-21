@@ -1,5 +1,4 @@
-﻿using PinPlatform.Common.DataModels;
-using PinPlatform.Domain.Models;
+﻿using PinPlatform.Domain.Models;
 using System;
 using System.Threading.Tasks;
 

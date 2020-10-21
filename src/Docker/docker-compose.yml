@@ -52,7 +52,7 @@ services:
 
 
   clientapiservice:
-    image: ${DOCKER_REGISTRY-}services-clientapi
+    image: ${DOCKER_REGISTRY-}clientapiservice
     build:
       context: ..
       dockerfile: Services.ClientAPI/Dockerfile
@@ -83,11 +83,11 @@ services:
     volumes:
       - ./.shares/provisioningapiservice/log:/var/log/provisioningapiservice
 
-  administrationservice:
-    image: ${DOCKER_REGISTRY-}servicesadministration
+  adminapiservice:
+    image: ${DOCKER_REGISTRY-}adminapiservice
     build:
       context: ..
-      dockerfile: Services.Administration/Dockerfile
+      dockerfile: Services.AdminAPI/Dockerfile
     ports:
     - 89:80
     environment:

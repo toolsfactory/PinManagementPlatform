@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using PinPlatform.Common.Exceptions;
+using PinPlatform.Domain.Exceptions;
 using System;
 using System.Net;
 using System.Threading.Tasks;

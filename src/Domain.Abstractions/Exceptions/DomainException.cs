@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace PinPlatform.Common.Exceptions
+namespace PinPlatform.Domain.Exceptions
 {
     public abstract class DomainException : Exception
     {

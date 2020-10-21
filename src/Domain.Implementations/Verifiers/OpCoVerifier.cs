@@ -23,7 +23,7 @@ namespace PinPlatform.Domain.Verifiers
                 throw new ArgumentNullException(nameof(opcoId));
 
             var lower = opcoId.ToLower();
-            var found = _configStore.OpCoConfigurations.TryGetValue(lower, out OpCoConfiguration? op);
+            var found = _configStore.OpCoConfigurations.TryGetValue(lower, out OpCoModel? op);
 
             if (!found || op is null)
                 throw new Exceptions.OpCoUnknownException();

@@ -15,8 +15,13 @@ namespace PinPlatform.Domain.Infrastructure.DB
         {
             modelBuilder.Entity<Pins>(entity =>
             {
-                entity.HasKey(e => new { e.HouseholdId, e.ProfileId, e.PinType })
+                entity.HasKey(e => new {e.OpcoId, e.HouseholdId, e.ProfileId, e.PinType })
                     .HasName("PRIMARY");
+
+                entity.Property(e => e.OpcoId)
+                .HasMaxLength(8)
+                .IsUnicode(false)
+                .IsRequired();
 
                 entity.Property(e => e.HouseholdId)
                     .HasMaxLength(64)
