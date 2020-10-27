@@ -37,5 +37,6 @@
     <ProjectReference Include="..\Domain.Abstractions\Domain.Abstractions.csproj" />
     <ProjectReference Include="..\Domain.Implementations\Domain.Implementations.csproj" />
     <ProjectReference Include="..\Domain.Infrastructure\Domain.Infrastructure.csproj" />
+    <ProjectReference Include="..\Services.Infrastructure\Services.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace PinPlatform.Services.ClientApi.Controllers
+namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
     [Route("/")]

@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PinPlatform.Common;
 using PinPlatform.Domain.Processors;
-using PinPlatform.Domain.Verifiers;
-using PinPlatform.Services.ClientApi.DataModel;
 
-namespace PinPlatform.Services.ClientApi.Controllers
+namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
     public class PinSettingsController : ControllerBase

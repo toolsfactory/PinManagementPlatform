@@ -8,44 +8,47 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.Initialization;
 using PinPlatform.Services.ClientAPI.Configuration;
+using PinPlatform.Services.Infrastructure.Authentication;
+using PinPlatform.Services.Infrastructure.Authorization;
+using PinPlatform.Services.Infrastructure.Configuration;
 
 namespace PinPlatform.Services.ClientAPI
 {
-    public class Startup
+    public class Startup : PinPlatform.Services.Infrastructure.StartupBase
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+            : base(configuration, environment)
+        { }
 
-        public IConfiguration Configuration { get; }
-
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerCustom(Configuration);
+            services.AddSingleton<ISecurityKeyProvider, SymetricSecurityKeyProvider>();
             services.AddInitialization();
             services.AddControllers();
             services.AddHealthChecks();
             services.AddRedisCustom(Configuration);
             services.AddDomainAndInfrastructure();
             services.AddDatabase(Configuration);
-            services.AddAutoMapper(typeof(Startup));
+            services.AddCustomAuthentication(Configuration);
+            services.AddCustomAuthorization(Configuration);
+
+            if (Environment.IsDevelopment())
+                services.AddSwaggerCustom(Configuration, "v2", "PinManagement Client API", "Sample API exposed to clients to manage & verify pins");
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwaggerCustom(env);
-
-            if(env.IsDevelopment())
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwaggerCustom(env);
                 app.UseMiddleware<Middleware.ExecutionTimeMiddleware>();
-
+            }
+            
             app.UseMiddleware<Middleware.ExceptionMiddleware>();
-
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -56,7 +59,6 @@ namespace PinPlatform.Services.ClientAPI
                 });
                 endpoints.MapControllers();
             });
-            app.UserRedisInformation();
         }        
     }
 }

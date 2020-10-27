@@ -5,13 +5,18 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
-namespace PinPlatform.Services.Infrastructure.Configuration
+namespace PinPlatform.Services.Infrastructure.Authentication
 {
-    public static class AuthorizationConfigurationExtension
+    public static class AuthenticationConfigurationExtension
     {
-        public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, 
+                                                           IConfiguration config)
         {
+            var securityKeyProvider = services.BuildServiceProvider().GetRequiredService<ISecurityKeyProvider>();
+            var tokenHeader = config.GetValue<string>(AuthConstants.ConfigKeyHeaderName, AuthConstants.DefaultTokenHeader);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -24,12 +29,21 @@ namespace PinPlatform.Services.Infrastructure.Configuration
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Symmetric:Key"])),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
-                    ValidIssuer = config.GetValue<string>("JwtIssuer"),
-                    ValidAudience = config.GetValue<string>("JwtAudience"),
+                    ValidIssuer = config.GetValue(AuthConstants.ConfigKeyValidIssuer, AuthConstants.DefaultValidIssuer),
+                    ValidAudience = config.GetValue(AuthConstants.ConfigKeyValidAudience, AuthConstants.DefaultValidAudience),
+                    IssuerSigningKeyResolver = (string token, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
+                    {
+                        var key = securityKeyProvider.Keys.Where(k => k.Key == kid).FirstOrDefault().Value;
+                        List<SecurityKey> keys = new List<SecurityKey>();
+                        if (key != null)
+                        {
+                            keys.Add(key);
+                        }
+                        return keys;
+                    }
                 };
                 x.Events = new JwtBearerEvents
                 {
@@ -43,19 +57,16 @@ namespace PinPlatform.Services.Infrastructure.Configuration
                     },
                     OnMessageReceived = context =>
                     {
-                        string authorization = context.Request.Headers["X-Internal-Auth"];
+                        string authToken = context.Request.Headers[tokenHeader];
 
                         // If no authorization header found, nothing to process further
-                        if (string.IsNullOrEmpty(authorization))
+                        if (string.IsNullOrWhiteSpace(authToken))
                         {
                             context.NoResult();
                             return Task.CompletedTask;
                         }
 
-                        if (authorization.StartsWith("Token ", StringComparison.OrdinalIgnoreCase))
-                        {
-                            context.Token = authorization.Substring("Token ".Length).Trim();
-                        }
+                         context.Token = authToken.Trim();
 
                         // If no token found, no further work possible
                         if (string.IsNullOrEmpty(context.Token))
@@ -67,11 +78,6 @@ namespace PinPlatform.Services.Infrastructure.Configuration
                         return Task.CompletedTask;
                     }
                 };
-            });
-            services.AddAuthorization(x =>
-            {
-                x.AddPolicy("ClientAccess", policy => policy.RequireClaim("x-client-access", "true"));
-                x.AddPolicy("AdminAccess", policy => policy.RequireClaim("x-admin-access", "true"));
             });
             return services;
         }

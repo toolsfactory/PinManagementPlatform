@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PinPlatform.Services.ClientApi.DataModel
+namespace PinPlatform.Services.ClientAPI.DataModel
 {
     public class PinChangeRequestModel
     {

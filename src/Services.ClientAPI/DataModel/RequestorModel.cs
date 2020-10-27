@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PinPlatform.Services.ClientApi.DataModel
+namespace PinPlatform.Services.ClientAPI.DataModel
 {
     public class RequestorModel
     {

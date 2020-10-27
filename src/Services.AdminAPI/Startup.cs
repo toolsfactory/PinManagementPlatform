@@ -1,63 +1,50 @@
-using AutoMapper;
 using PinPlatform.Common.Implementrations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PinPlatform.Common;
-using StackExchange.Redis.Extensions.Core.Configuration;
-using StackExchange.Redis.Extensions.System.Text.Json;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Threading.Tasks;
-using System;
-using System.Text;
+using PinPlatform.Services.Infrastructure.Authentication;
+using Microsoft.Extensions.Hosting.Initialization;
+using PinPlatform.Services.Infrastructure.Authorization;
 using PinPlatform.Services.Infrastructure.Configuration;
+using PinPlatform.Services.ClientAPI.Configuration;
 
-namespace Services.Administration
+namespace PinPlatform.Services.AdminAPI
 {
-    public class Startup
+    public class Startup : PinPlatform.Services.Infrastructure.StartupBase
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment) 
+            : base(configuration, environment)
+        {  }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            services.AddSwaggerGen();
-            services.AddEntityFrameworkMySql();
-            services.AddDbContextPool<PinPlatform.Domain.Infrastructure.DB.DEMODBContext>(
-                options => options.UseMySql("server=db;port=3306;user=root;password=test123;database=DEMODB"));
-            var redisConfiguration = Configuration.GetSection("Redis").Get<RedisConfiguration>();
-            services.AddStackExchangeRedisExtensions<SystemTextJsonSerializer>(redisConfiguration);
             services.AddSingleton<IPinCacheKeyGenerator, PinCacheKeyGenerator>();
+            services.AddSingleton<ISecurityKeyProvider, SymetricSecurityKeyProvider>();
+            services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
-            services.AddAutoMapper(typeof(Startup));
+            services.AddInitialization();
+            services.AddControllers();
+            services.AddDatabase(Configuration);
+            services.AddRedisCustom(Configuration);
+            services.AddCustomAuthentication(Configuration);
+            services.AddCustomAuthorization(Configuration);
 
-            services.AddAuthenticationAndAuthorization(Configuration);
+            if(Environment.IsDevelopment())
+                services.AddSwaggerCustom(Configuration, "v2", "PinManagement Admin API", "A simple admin api for demo purposes");
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UserRedisInformation();
+                app.UseSwaggerCustom(env);
             }
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
-           
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -65,8 +52,6 @@ namespace Services.Administration
             {
                 endpoints.MapControllers();
             });
-
-            app.UserRedisInformation();
         }
     }
 }

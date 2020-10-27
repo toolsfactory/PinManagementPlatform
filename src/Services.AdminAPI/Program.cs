@@ -11,7 +11,7 @@ using Microsoft.Extensions.Hosting.Initialization;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace Services.Administration
+namespace PinPlatform.Services.AdminAPI
 {
     public class Program
     {

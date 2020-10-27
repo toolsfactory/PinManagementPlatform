@@ -14,7 +14,7 @@ using StackExchange.Redis.Extensions.Core.Abstractions;
 using Tiveria.Common.Extensions;
 using PinPlatform.Domain.Models;
 
-namespace PinPlatform.Services.Administration.Controllers
+namespace PinPlatform.Services.AdminAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]

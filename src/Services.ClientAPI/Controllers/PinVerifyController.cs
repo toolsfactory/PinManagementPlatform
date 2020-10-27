@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Domain.Processors;
-using PinPlatform.Services.ClientApi.DataModel;
+using PinPlatform.Services.ClientAPI.DataModel;
 
-namespace PinPlatform.Services.ClientApi.Controllers
+namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
+    [Authorize(Policy = "ClientAccess")]
     public class PinVerifyController : ControllerBase
     {
         private readonly ILogger<PinVerifyController> _logger;
         private readonly IVerifyPinProcessor _processor;
-        private readonly IMapper _mapper;
 
-        public PinVerifyController(ILogger<PinVerifyController> logger, IVerifyPinProcessor processor, IMapper mapper)
+        public PinVerifyController(ILogger<PinVerifyController> logger, IVerifyPinProcessor processor)
         {
             _logger = logger;
             _processor = processor;
-            _mapper = mapper;
         }
 
         [HttpPost]

@@ -9,8 +9,11 @@ using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
+using PinPlatform.Services.Infrastructure.Authentication;
+using System.Linq;
 
-namespace PinPlatform.Services.Administration.Controllers
+namespace PinPlatform.Services.AdminAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -18,23 +21,19 @@ namespace PinPlatform.Services.Administration.Controllers
     {
         private readonly ILogger<TokenController> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IJwtTokenGenerator _tokenGenerator;
 
-        public TokenController(ILogger<TokenController> logger, IConfiguration configuration)
+        public TokenController(ILogger<TokenController> logger, IConfiguration configuration, IJwtTokenGenerator tokenGenerator)
         {
             _logger = logger;
             _configuration = configuration;
+            _tokenGenerator = tokenGenerator;
         }
 
         [HttpGet]
         [Route("Issue")]
-        public IActionResult GetToken([FromQuery]string tokenType = "client")
+        public IActionResult GetToken([FromQuery] string keyId, [FromQuery]string tokenType = "client", [FromQuery] ushort expiresSec = 90)
         {
-            var signingCredentials = new SigningCredentials(
-                key: new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Symmetric:Key"])),
-                algorithm: SecurityAlgorithms.HmacSha256);
-
-            DateTime jwtDate = DateTime.Now;
-
             tokenType ??= "client";
             var claims = new List<Claim>();
             if (tokenType.ToLower() == "admin")
@@ -42,32 +41,19 @@ namespace PinPlatform.Services.Administration.Controllers
             else
                 claims.Add(new Claim("x-client-access", "true"));
 
-            var jwt = new JwtSecurityToken(
-                audience: "jwt-test", // must match the audience in AddJwtBearer()
-                issuer: "jwt-test", // must match the issuer in AddJwtBearer()
-
-                // Add whatever claims you'd want the generated token to include
-                claims: claims,
-                notBefore: jwtDate,
-                expires: jwtDate.AddSeconds(90), // Should be short lived. For logins, it's may be fine to use 24h
-
-                // Provide a cryptographic key used to sign the token.
-                // When dealing with symmetric keys then this must be
-                // the same key used to validate the token.
-                signingCredentials: signingCredentials
-            );
-
-            // Generate the actual token as a string
-            string token = new JwtSecurityTokenHandler().WriteToken(jwt);
-
-            // Return some agreed upon or documented structure.
-            return Ok(new
+            try
             {
-                jwt = token,
-                // Even if the expiration time is already a part of the token, it's common to be 
-                // part of the response body.
-                unixTimeExpiresAt = new DateTimeOffset(jwtDate).ToUnixTimeMilliseconds()
-            });
+                var token = _tokenGenerator.GenerateToken(claims, keyId, expiresSec);
+                return Ok(new { jwt = token.Token, unixTimeExpiresAt = token.ExpiresAt, expiresAt = UnixTimeStampToDateTime(token.ExpiresAt).ToString() });
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return BadRequest(new { Error = "KeyId not existing" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = "Unknown exception", Exception = ex });
+            }
         }
 
         [HttpGet]
@@ -75,7 +61,7 @@ namespace PinPlatform.Services.Administration.Controllers
         [Route("Validate")]
         public IActionResult ValidateAnyToken()
         {
-            return Ok();
+            return InternalValidate();
         }
 
         [HttpGet]
@@ -83,7 +69,7 @@ namespace PinPlatform.Services.Administration.Controllers
         [Route("ValidateAdmin")]
         public IActionResult ValidateAdminToken()
         {
-            return Ok();
+            return InternalValidate();
         }
 
         [HttpGet]
@@ -91,7 +77,39 @@ namespace PinPlatform.Services.Administration.Controllers
         [Route("ValidateClient")]
         public IActionResult ValidateClientToken()
         {
+            return InternalValidate();
+        }
+
+        private IActionResult InternalValidate()
+        {
+            var item = this.User.Claims.Where(x => x.Type == "exp").FirstOrDefault();
+            if (item != null)
+            {
+                if (long.TryParse(item.Value, out var value))
+                    return Ok(new { expires = value, text = UnixTimeStampToDateTime(value).ToString() });
+            }
             return Ok();
+        }
+
+        private static DateTime UnixTimeStampToDateTime(long unixTimeStampMilli)
+        {
+            // Unix timestamp is seconds past epoch
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStampMilli).ToLocalTime();
+            return dtDateTime;
+        }
+
+        [HttpGet]
+        [Route("GenerateKeyPair")]
+        public IActionResult GenerateKeyPair()
+        {
+            using RSA rsa = RSA.Create();
+            var result = new StringBuilder();
+            result.AppendLine("-----Private key-----");
+            result.AppendLine(Convert.ToBase64String(rsa.ExportRSAPrivateKey()));
+            result.AppendLine("-----Public key-----");
+            result.AppendLine(Convert.ToBase64String(rsa.ExportRSAPublicKey()));
+            return Ok(result.ToString());
         }
     }
 }

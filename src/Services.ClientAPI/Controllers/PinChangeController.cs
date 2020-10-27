@@ -1,27 +1,22 @@
 ﻿using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PinPlatform.Common;
 using PinPlatform.Domain.Processors;
-using PinPlatform.Domain.Repositories;
-using PinPlatform.Domain.Verifiers;
-using PinPlatform.Services.ClientApi.DataModel;
+using PinPlatform.Services.ClientAPI.DataModel;
 
-namespace PinPlatform.Services.ClientApi.Controllers
+namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
     public class PinChangeController : ControllerBase
     {
         private readonly ILogger<PinChangeController> _logger;
         private readonly IChangePinProcessor _pinChangeProcessor;
-        private readonly IMapper _mapper;
 
-        public PinChangeController(ILogger<PinChangeController> logger,IChangePinProcessor pinChangeProcessor, IMapper mapper)
+        public PinChangeController(ILogger<PinChangeController> logger,IChangePinProcessor pinChangeProcessor)
         {
             _logger = logger;
-            this._pinChangeProcessor = pinChangeProcessor;
+            _pinChangeProcessor = pinChangeProcessor;
         }
 
         [HttpPost]
