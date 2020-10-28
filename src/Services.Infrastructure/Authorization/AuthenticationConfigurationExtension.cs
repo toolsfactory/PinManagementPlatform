@@ -16,6 +16,7 @@ namespace PinPlatform.Services.Infrastructure.Authorization
             {
                 x.AddPolicy("ClientAccess", policy => policy.RequireClaim("x-client-access", "true"));
                 x.AddPolicy("AdminAccess", policy => policy.RequireClaim("x-admin-access", "true"));
+                x.AddPolicy("ProvisioningAccess", policy => policy.RequireClaim("x-provisioning-access", "true"));
             });
             return services;
         }

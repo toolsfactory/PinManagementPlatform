@@ -31,8 +31,8 @@ namespace PinPlatform.Domain.Verifiers
 
             await LoadPinModelAsync(data.Requestor);
 
-            if (IsInGracePeriod(out int secsToWait))
-                throw new Exceptions.PinVerificationWithinGracePeriodException(_storedPinModel.FailedAttemptsCount, secsToWait);
+            CheckIsPinLocked();
+            CheckIsInGracePeriod();
 
             if ((data.PinHash.Length != _storedPinModel.PinHash.Length) || !data.PinHash.Equals(_storedPinModel.PinHash))
             {
@@ -53,11 +53,18 @@ namespace PinPlatform.Domain.Verifiers
                 throw new Exceptions.PinDoesntExistException();
         }
 
-        private bool IsInGracePeriod(out int secondsToWait)
+        private void CheckIsPinLocked()
         {
-            secondsToWait = 0;
+            if (_storedPinModel.PinLocked)
+            {
+                throw new Exceptions.PinLockedException(_storedPinModel.LockReason);
+            }
+        }
+
+        private void CheckIsInGracePeriod()
+        {
             if (_storedPinModel.FailedAttemptsCount == 0)
-                return false;
+                return;
 
             var gracePeriodInSec = GetGracePeriodForFailedCount(_storedPinModel.FailedAttemptsCount);
             var boundry = DateTime.Now.AddSeconds(-gracePeriodInSec);
@@ -70,10 +77,12 @@ namespace PinPlatform.Domain.Verifiers
             };
 
             if (inGrace)
-                secondsToWait = (int) (_storedPinModel.LastFailedAttempt - boundry).TotalSeconds;
-
-            return inGrace;
+            {
+                var secondsToWait = (int)(_storedPinModel.LastFailedAttempt - boundry).TotalSeconds;
+                throw new Exceptions.WithinGracePeriodException(_storedPinModel.FailedAttemptsCount, secondsToWait);
+            }
         }
+
         private int GetGracePeriodForFailedCount(uint failedAttemptsCount) => failedAttemptsCount switch
         {
             uint count when count < 3 => 30,

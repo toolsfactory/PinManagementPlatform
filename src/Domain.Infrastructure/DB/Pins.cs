@@ -12,6 +12,7 @@ namespace PinPlatform.Domain.Infrastructure.DB
         public string PinSalt { get; set; }
         public string PinHash { get; set; }
         public bool PinLocked { get; set; }
+        public string LockReason { get; set; }
         public string Comments { get; set; }
     }
 }

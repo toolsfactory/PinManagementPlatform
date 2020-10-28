@@ -28,10 +28,12 @@ namespace PinPlatform.Domain.Infrastructure
 
         public async Task CreateOrUpdatePinAsync(RequestorModel requestor, PinModel pin)
         {
+            var isNew = false;
             if (!requestor.PinType.HasValue)
                 requestor.PinType = 0;
             var found = await _dbContext.Pins.SingleOrDefaultAsync(x => x.HouseholdId == requestor.HouseholdId && x.ProfileId == x.ProfileId && x.PinType == requestor.PinType);
-            if(found is null)
+            if (found is null)
+            {
                 found = new Pins()
                 {
                     OpcoId = requestor.OpCoId,
@@ -39,11 +41,14 @@ namespace PinPlatform.Domain.Infrastructure
                     ProfileId = requestor.ProfileId,
                     PinType = requestor.PinType.Value
                 };
+                isNew = true;
+            }
             found.PinHash = pin.PinHash;
             found.PinLocked = pin.PinLocked;
             found.PinSalt = pin.PinSalt;
+            found.LockReason = pin.LockReason;
 
-            if (found is null)
+            if (isNew)
                 await _dbContext.Pins.AddAsync(found);
 
             await _dbContext.SaveChangesAsync();
@@ -86,6 +91,7 @@ namespace PinPlatform.Domain.Infrastructure
                     {
                         PinHash = loaded.PinHash,
                         PinLocked = loaded.PinLocked,
+                        LockReason = loaded.LockReason,
                         PinSalt = loaded.PinSalt,
                         FailedAttemptsCount = 0,
                         LastFailedAttempt = DateTime.MinValue

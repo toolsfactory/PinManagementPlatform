@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Diagnostics;
 
-namespace PinPlatform.Services.ClientAPI.Middleware
+namespace PinPlatform.Services.Infrastructure.Middleware
 {
     public class ExecutionTimeMiddleware
     {

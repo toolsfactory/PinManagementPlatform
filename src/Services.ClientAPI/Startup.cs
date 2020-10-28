@@ -1,4 +1,3 @@
-using AutoMapper;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -11,6 +10,7 @@ using PinPlatform.Services.ClientAPI.Configuration;
 using PinPlatform.Services.Infrastructure.Authentication;
 using PinPlatform.Services.Infrastructure.Authorization;
 using PinPlatform.Services.Infrastructure.Configuration;
+using PinPlatform.Services.Infrastructure.Middleware;
 
 namespace PinPlatform.Services.ClientAPI
 {
@@ -42,10 +42,10 @@ namespace PinPlatform.Services.ClientAPI
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwaggerCustom(env);
-                app.UseMiddleware<Middleware.ExecutionTimeMiddleware>();
+                app.UseMiddleware<ExecutionTimeMiddleware>();
             }
             
-            app.UseMiddleware<Middleware.ExceptionMiddleware>();
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using PinPlatform.Domain.Processors;
 namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
+    [Authorize(Policy = "ClientAccess")]
     public class PinSettingsController : ControllerBase
     {
         private readonly ILogger<PinVerifyController> _logger;

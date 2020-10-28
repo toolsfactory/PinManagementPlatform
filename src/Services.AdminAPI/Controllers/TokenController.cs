@@ -36,10 +36,16 @@ namespace PinPlatform.Services.AdminAPI.Controllers
         {
             tokenType ??= "client";
             var claims = new List<Claim>();
-            if (tokenType.ToLower() == "admin")
-                claims.Add(new Claim("x-admin-access", "true"));
-            else
-                claims.Add(new Claim("x-client-access", "true"));
+            switch (tokenType.ToLower())
+            {
+                case "admin": claims.Add(new Claim("x-admin-access", "true")); break;
+                case "client": claims.Add(new Claim("x-client-access", "true")); break;
+                case "provisioning": claims.Add(new Claim("x-provisioning-access", "true")); break;
+                case "all": claims.Add(new Claim("x-admin-access", "true"));
+                            claims.Add(new Claim("x-client-access", "true"));
+                            claims.Add(new Claim("x-provisioning-access", "true")); 
+                            break;
+            };
 
             try
             {

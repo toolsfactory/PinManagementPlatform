@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using PinPlatform.Services.ClientAPI.DataModel;
 namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
+    [Authorize(Policy = "ClientAccess")]
     public class PinChangeController : ControllerBase
     {
         private readonly ILogger<PinChangeController> _logger;

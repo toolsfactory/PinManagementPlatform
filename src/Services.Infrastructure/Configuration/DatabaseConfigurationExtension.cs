@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace PinPlatform.Services.ClientAPI.Configuration
+namespace PinPlatform.Services.Infrastructure.Configuration
 {
     public static class DatabaseConfigurationExtension
     {

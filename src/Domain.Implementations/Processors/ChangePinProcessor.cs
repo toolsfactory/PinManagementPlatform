@@ -34,7 +34,6 @@ namespace PinPlatform.Domain.Processors
             {
                 Requestor = data.Requestor,
                 PinHash = data.OldPinHash
-
             };
             var pinmodel = await _pinHashVerifier.VerifyPinHashAsync(param);
             var model = new PinChangeVerificationModel()

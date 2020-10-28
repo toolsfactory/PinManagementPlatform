@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.AspNetCore.Http;
 using PinPlatform.Domain.Exceptions;
 using System;
 using System.Net;
@@ -8,7 +6,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PinPlatform.Services.ClientAPI.Middleware
+namespace PinPlatform.Services.Infrastructure.Middleware
 {
     public class ExceptionMiddleware
     {

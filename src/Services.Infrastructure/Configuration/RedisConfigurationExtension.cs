@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
 
-namespace PinPlatform.Services.ClientAPI.Configuration
+namespace PinPlatform.Services.Infrastructure.Configuration
 {
     public static class RedisConfigurationExtension
     {

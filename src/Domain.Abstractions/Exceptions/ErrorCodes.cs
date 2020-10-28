@@ -11,6 +11,7 @@ namespace PinPlatform.Domain.Exceptions
         NoPinHashFound = 2001,
         PinHashesNotMatching = 2002,
         WithinGracePeriod = 2003,
+        PinLocked = 2004,
         Unknown = ushort.MaxValue
     }
 
@@ -27,6 +28,7 @@ namespace PinPlatform.Domain.Exceptions
             _mappingTable.Add(ErrorCodes.NoPinHashFound, "No matching pin found");
             _mappingTable.Add(ErrorCodes.PinHashesNotMatching, "Pin hash not matching. Pin invalid.");
             _mappingTable.Add(ErrorCodes.WithinGracePeriod, "Still within grace period. Retry after the specified time.");
+            _mappingTable.Add(ErrorCodes.PinLocked, "Pin is locked.");
         }
 
         public static string GetTextForErrorCode(ErrorCodes code)

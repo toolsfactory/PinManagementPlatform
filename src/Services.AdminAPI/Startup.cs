@@ -9,7 +9,6 @@ using PinPlatform.Services.Infrastructure.Authentication;
 using Microsoft.Extensions.Hosting.Initialization;
 using PinPlatform.Services.Infrastructure.Authorization;
 using PinPlatform.Services.Infrastructure.Configuration;
-using PinPlatform.Services.ClientAPI.Configuration;
 
 namespace PinPlatform.Services.AdminAPI
 {

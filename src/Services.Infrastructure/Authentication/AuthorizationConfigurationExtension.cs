@@ -34,6 +34,7 @@ namespace PinPlatform.Services.Infrastructure.Authentication
                     ValidateLifetime = true,
                     ValidIssuer = config.GetValue(AuthConstants.ConfigKeyValidIssuer, AuthConstants.DefaultValidIssuer),
                     ValidAudience = config.GetValue(AuthConstants.ConfigKeyValidAudience, AuthConstants.DefaultValidAudience),
+                    ClockSkew = TimeSpan.FromSeconds(5),
                     IssuerSigningKeyResolver = (string token, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
                     {
                         var key = securityKeyProvider.Keys.Where(k => k.Key == kid).FirstOrDefault().Value;
