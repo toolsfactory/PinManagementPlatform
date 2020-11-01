@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Domain.Processors;
+using PinPlatform.Services.Infrastructure.Authorization;
 using PinPlatform.Services.ProvisioningAPI.DataModel;
 
 namespace PinPlatform.Services.ProvisioningAPI.Controllers
 {
     [ApiController]
-    [Authorize(Policy = "ProvisioningAccess")]
+    [Authorize(Policy = AuthorizationHelper.ProvisioningAccessPolicy)]
 
     public class PinProvisioningController : ControllerBase
     {

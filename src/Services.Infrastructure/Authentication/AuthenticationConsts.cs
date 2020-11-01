@@ -1,6 +1,6 @@
 ﻿namespace PinPlatform.Services.Infrastructure.Authentication
 {
-    public static class AuthConstants
+    public static class AuthenticationConsts
     {
         public const string DefaultTokenHeader = "X-Internal-Auth";
         public const string DefaultValidIssuer = "MGTest-Issuer";

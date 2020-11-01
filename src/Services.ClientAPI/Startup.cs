@@ -2,6 +2,7 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,6 +26,7 @@ namespace PinPlatform.Services.ClientAPI
             services.AddSingleton<ISecurityKeyProvider, SymetricSecurityKeyProvider>();
             services.AddInitialization();
             services.AddControllers();
+            services.AddApiVersioningCustom(Configuration);
             services.AddHealthChecks();
             services.AddRedisCustom(Configuration);
             services.AddDomainAndInfrastructure();
@@ -33,15 +35,15 @@ namespace PinPlatform.Services.ClientAPI
             services.AddCustomAuthorization(Configuration);
 
             if (Environment.IsDevelopment())
-                services.AddSwaggerCustom(Configuration, "v2", "PinManagement Client API", "Sample API exposed to clients to manage & verify pins");
+                services.AddSwaggerCustom(Configuration, "PinManagement Client API", "Sample API exposed to clients to manage & verify pins");
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwaggerCustom(env);
+                app.UseSwaggerCustom(env, provider);
                 app.UseMiddleware<ExecutionTimeMiddleware>();
             }
             

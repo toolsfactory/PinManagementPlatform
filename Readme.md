@@ -2,6 +2,9 @@
 
 A dummy service for pin management to try out standard concepts and principles of microservice design in .net core.
 
+## Prerequisites
+This demo requires Docker Desktop and Microsoft Visual Studio Community Edition 2019 16.7 to be compiled. All other dependencies should automatically download when deploying the solution via docker-compose.
+
 ## Implemented support services
 All services are exposed on different ports of localhost via http
 
@@ -41,7 +44,7 @@ http://localhost:80/swagger.index.html
 
 ### AdminAPI
 on port 89 an admin api with its subfunctions can be reached. 
-This api should help to test and verify the other parts of the solution and for example allow to generate random pins, clear the cache and so on.
+This api should help to test and verify the other parts of the solution and for example allow to generate random pins, clear the cache and so on but is not intended for a production environment. Also tkens can be generated and tested there. 
 http://localhost:89/swagger.index.html
 
 ### ProvisioningAPI
@@ -52,6 +55,23 @@ http://localhost:81/swagger.index.html
 # Other apsects
 
 ## Authentication
-At the moment, authentication is disabled. But code to add JWT base authentication is already in the solution and could easily be activeated to also show that part
+Authentication is now active and currently configured to use symetric keys (pub/priv key crypto can be used as alternative).
 
+Change the following code in the Startup.cs files
 
+`
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<ISecurityKeyProvider, SymetricSecurityKeyProvider>();
+    ...
+`
+
+to
+
+`
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddSingleton<ISecurityKeyProvider, RSASecurityKeyProvider>();
+    ...
+`
+and update the configuration in the appsettings.json files.

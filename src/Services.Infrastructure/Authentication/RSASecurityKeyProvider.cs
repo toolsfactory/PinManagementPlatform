@@ -15,7 +15,7 @@ namespace PinPlatform.Services.Infrastructure.Authentication
         public RSASecurityKeyProvider(IConfiguration config)
         {
             var keys = new Dictionary<string, SecurityKey>();
-            var entries = config.GetSection(AuthConstants.ConfigKeyAsymetricPublicKeys).Get<Dictionary<string, string>>();
+            var entries = config.GetSection(AuthenticationConsts.ConfigKeyAsymetricPublicKeys).Get<Dictionary<string, string>>();
             
             foreach (var item in entries)
             {

@@ -7,16 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PinPlatform.Services.Infrastructure.Authentication
 {
     public static class AuthenticationConfigurationExtension
     {
-        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, 
-                                                           IConfiguration config)
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services, IConfiguration config)
         {
+            // Avoid automatic mapping of certain claim types
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             var securityKeyProvider = services.BuildServiceProvider().GetRequiredService<ISecurityKeyProvider>();
-            var tokenHeader = config.GetValue<string>(AuthConstants.ConfigKeyHeaderName, AuthConstants.DefaultTokenHeader);
+            var tokenHeader = config.GetValue<string>(AuthenticationConsts.ConfigKeyHeaderName, AuthenticationConsts.DefaultTokenHeader);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -32,8 +35,8 @@ namespace PinPlatform.Services.Infrastructure.Authentication
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
-                    ValidIssuer = config.GetValue(AuthConstants.ConfigKeyValidIssuer, AuthConstants.DefaultValidIssuer),
-                    ValidAudience = config.GetValue(AuthConstants.ConfigKeyValidAudience, AuthConstants.DefaultValidAudience),
+                    ValidIssuer = config.GetValue(AuthenticationConsts.ConfigKeyValidIssuer, AuthenticationConsts.DefaultValidIssuer),
+                    ValidAudience = config.GetValue(AuthenticationConsts.ConfigKeyValidAudience, AuthenticationConsts.DefaultValidAudience),
                     ClockSkew = TimeSpan.FromSeconds(5),
                     IssuerSigningKeyResolver = (string token, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
                     {

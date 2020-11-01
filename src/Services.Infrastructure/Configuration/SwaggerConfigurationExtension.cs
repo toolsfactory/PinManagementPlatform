@@ -1,46 +1,31 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace PinPlatform.Services.Infrastructure.Configuration
 {
     public static class SwaggerConfigurationExtension
     {
-        public static IServiceCollection AddSwaggerCustom(this IServiceCollection services, IConfiguration config,  string version, string title, string description)
+        public static IServiceCollection AddSwaggerCustom(this IServiceCollection services, IConfiguration config,  string title, string description)
         {
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc(version, new OpenApiInfo
-                {
-                    Version = version,
-                    Title = title,
-                    Description = description,
-                    TermsOfService = new Uri("https://example.com/terms"),
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Michael Geissler"
-                    },
-                    License = new OpenApiLicense
-                    {
-                        Name = "Use under MIT License",
-                        Url = new Uri("https://mit-license.org/")
-                    }
-                });
                 c.AddSecurityDefinition("Token", new Microsoft.OpenApi.Models.OpenApiSecurityScheme()
                 {
-                    In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                    Name = config[Authentication.AuthConstants.ConfigKeyHeaderName],
+                    In = ParameterLocation.Header,
+                    Name = config[Authentication.AuthenticationConsts.ConfigKeyHeaderName],
                     Description = "JWT Token for inter app authentication",
-                    Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.ApiKey,
                     BearerFormat = "JWT"
                 });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
@@ -57,6 +42,7 @@ namespace PinPlatform.Services.Infrastructure.Configuration
                             new string[] {}
                     }
                 });
+                c.OperationFilter<SwaggerDefaultValuesFilter>();
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
@@ -66,7 +52,7 @@ namespace PinPlatform.Services.Infrastructure.Configuration
             return services;
         }
 
-        public static IApplicationBuilder UseSwaggerCustom(this IApplicationBuilder app, IWebHostEnvironment env)
+        public static IApplicationBuilder UseSwaggerCustom(this IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
@@ -74,9 +60,13 @@ namespace PinPlatform.Services.Infrastructure.Configuration
 
                 // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
                 // specifying the Swagger JSON endpoint.
-                app.UseSwaggerUI(c =>
+                app.UseSwaggerUI(options =>
                 {
-                    c.SwaggerEndpoint("/swagger/v2/swagger.json", "My API V1");
+                    // build a swagger endpoint for each discovered API version
+                    foreach (var description in provider.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    }
                 });
             }
             return app;

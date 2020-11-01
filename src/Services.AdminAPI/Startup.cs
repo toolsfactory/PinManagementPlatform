@@ -9,6 +9,7 @@ using PinPlatform.Services.Infrastructure.Authentication;
 using Microsoft.Extensions.Hosting.Initialization;
 using PinPlatform.Services.Infrastructure.Authorization;
 using PinPlatform.Services.Infrastructure.Configuration;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 namespace PinPlatform.Services.AdminAPI
 {
@@ -26,22 +27,23 @@ namespace PinPlatform.Services.AdminAPI
 
             services.AddInitialization();
             services.AddControllers();
+            services.AddApiVersioningCustom(Configuration);
             services.AddDatabase(Configuration);
             services.AddRedisCustom(Configuration);
             services.AddCustomAuthentication(Configuration);
             services.AddCustomAuthorization(Configuration);
 
             if(Environment.IsDevelopment())
-                services.AddSwaggerCustom(Configuration, "v2", "PinManagement Admin API", "A simple admin api for demo purposes");
+                services.AddSwaggerCustom(Configuration, "PinManagement Admin API", "A simple admin api for demo purposes");
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UserRedisInformation();
-                app.UseSwaggerCustom(env);
+                app.UseSwaggerCustom(env, provider);
             }
 
             app.UseRouting();

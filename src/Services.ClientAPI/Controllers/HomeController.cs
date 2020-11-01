@@ -2,6 +2,7 @@
 
 namespace PinPlatform.Services.ClientAPI.Controllers
 {
+    [ApiVersionNeutral]
     [ApiController]
     [Route("/")]
     [ApiExplorerSettings(IgnoreApi = true)]

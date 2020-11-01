@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
 using PinPlatform.Services.Infrastructure.Authentication;
 using System.Linq;
+using PinPlatform.Services.Infrastructure.Authorization;
 
 namespace PinPlatform.Services.AdminAPI.Controllers
 {
@@ -63,7 +62,7 @@ namespace PinPlatform.Services.AdminAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize] // Uses the default configured scheme, in this case "Bearer".
+        [Authorize]
         [Route("Validate")]
         public IActionResult ValidateAnyToken()
         {
@@ -71,7 +70,7 @@ namespace PinPlatform.Services.AdminAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy ="AdminAccess")] // Uses the default configured scheme, in this case "Bearer".
+        [Authorize(Policy = AuthorizationHelper.AdminAccessPolicy)]
         [Route("ValidateAdmin")]
         public IActionResult ValidateAdminToken()
         {
@@ -79,7 +78,7 @@ namespace PinPlatform.Services.AdminAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "ClientAccess")] // Uses the default configured scheme, in this case "Bearer".
+        [Authorize(Policy = AuthorizationHelper.ClientAccessPolicy)]
         [Route("ValidateClient")]
         public IActionResult ValidateClientToken()
         {
@@ -99,7 +98,6 @@ namespace PinPlatform.Services.AdminAPI.Controllers
 
         private static DateTime UnixTimeStampToDateTime(long unixTimeStampMilli)
         {
-            // Unix timestamp is seconds past epoch
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStampMilli).ToLocalTime();
             return dtDateTime;
@@ -107,6 +105,7 @@ namespace PinPlatform.Services.AdminAPI.Controllers
 
         [HttpGet]
         [Route("GenerateKeyPair")]
+        [Authorize(Policy = AuthorizationHelper.AdminAccessPolicy)]
         public IActionResult GenerateKeyPair()
         {
             using RSA rsa = RSA.Create();

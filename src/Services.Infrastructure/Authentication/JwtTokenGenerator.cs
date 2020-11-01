@@ -27,8 +27,8 @@ namespace PinPlatform.Services.Infrastructure.Authentication
             var dtEnd = dtStart.AddSeconds(expiresSec);
 
             var jwt = new JwtSecurityToken(
-                audience: _configuration.GetValue(AuthConstants.ConfigKeyValidAudience, AuthConstants.DefaultValidAudience), 
-                issuer: _configuration.GetValue(AuthConstants.ConfigKeyValidIssuer, AuthConstants.DefaultValidIssuer), 
+                audience: _configuration.GetValue(AuthenticationConsts.ConfigKeyValidAudience, AuthenticationConsts.DefaultValidAudience), 
+                issuer: _configuration.GetValue(AuthenticationConsts.ConfigKeyValidIssuer, AuthenticationConsts.DefaultValidIssuer), 
                 claims: claims,
                 notBefore: dtStart,
                 expires: dtEnd,
@@ -41,7 +41,7 @@ namespace PinPlatform.Services.Infrastructure.Authentication
 
         private SigningCredentials GetAsymetricCredentials(string keyId)
         {
-            var entries = _configuration.GetSection(AuthConstants.ConfigKeyAsymetricPrivateKeys).Get<Dictionary<string, string>>();
+            var entries = _configuration.GetSection(AuthenticationConsts.ConfigKeyAsymetricPrivateKeys).Get<Dictionary<string, string>>();
             if (!entries.ContainsKey(keyId))
                 throw new ArgumentOutOfRangeException(nameof(keyId));
 
@@ -52,7 +52,7 @@ namespace PinPlatform.Services.Infrastructure.Authentication
 
         private SigningCredentials GetSymetricCredentials(string keyId)
         {
-            var entries = _configuration.GetSection(AuthConstants.ConfigKeySymetricKeys).Get<Dictionary<string, string>>();
+            var entries = _configuration.GetSection(AuthenticationConsts.ConfigKeySymetricKeys).Get<Dictionary<string, string>>();
             if (!entries.ContainsKey(keyId))
                 throw new ArgumentOutOfRangeException(nameof(keyId));
 

@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Domain.Processors;
 using PinPlatform.Services.ClientAPI.DataModel;
+using PinPlatform.Services.Infrastructure.Authorization;
 
 namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
-    [Authorize(Policy = "ClientAccess")]
+    [Authorize(Policy = AuthorizationHelper.ClientAccessPolicy)]
+    [Route("v{version:apiversion}/{opcoid}")]
     public class PinVerifyController : ControllerBase
     {
         private readonly ILogger<PinVerifyController> _logger;
@@ -22,7 +24,8 @@ namespace PinPlatform.Services.ClientAPI.Controllers
         }
 
         [HttpPost]
-        [Route("v1/{opcoid}/pin/verify")]
+        [Route("pin/verify")]
+        [ApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetVerifyPinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinVerifyRequestModel request)
         {
@@ -42,7 +45,10 @@ namespace PinPlatform.Services.ClientAPI.Controllers
         }
 
         [HttpGet]
-        [Route("v1/{opcoid}/{householdid}/{profileid}/pins/{pintype}/verify")]
+        [Route("{householdid}/{profileid}/pins/{pintype}/verify")]
+        [ApiVersion("1.0")]
+        [ApiVersion("1.1")]
+        [ApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetVerifyPinAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromRoute] uint pintype, [FromQuery] string pinhash)
         {
@@ -62,7 +68,8 @@ namespace PinPlatform.Services.ClientAPI.Controllers
         }
 
         [HttpPost]
-        [Route("v1/{opcoid}/{householdid}/{profileid}/pin/verify")]
+        [Route("{householdid}/{profileid}/pin/verify")]
+        [ApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> PostVerifyPinAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromBody] PinHashModel pinDetails)
         {

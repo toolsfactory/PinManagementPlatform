@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Domain.Processors;
+using PinPlatform.Services.Infrastructure.Authorization;
 
 namespace PinPlatform.Services.ClientAPI.Controllers
 {
     [ApiController]
-    [Authorize(Policy = "ClientAccess")]
+    [Route("v{version:apiversion}/{opcoid}")]
+    [Authorize(Policy = AuthorizationHelper.ClientAccessPolicy)]
     public class PinSettingsController : ControllerBase
     {
         private readonly ILogger<PinVerifyController> _logger;
@@ -21,7 +23,9 @@ namespace PinPlatform.Services.ClientAPI.Controllers
         }
 
         [HttpPost]
-        [Route("v1/{opcoid}/pin/settings")]
+        [Route("pin/settings")]
+        [ApiVersion("1")]
+        [ApiVersion("1.1")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetPinSettingsAsync([FromRoute] string opcoid, [FromBody] DataModel.RequestorModel requestor)
         {
@@ -36,7 +40,8 @@ namespace PinPlatform.Services.ClientAPI.Controllers
         }
 
         [HttpGet]
-        [Route("v1/{opcoid}/{householdid}/{profileid}/pins")]
+        [Route("{householdid}/{profileid}/pins")]
+        [ApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetPinSettingsAlternativeAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid)
         {

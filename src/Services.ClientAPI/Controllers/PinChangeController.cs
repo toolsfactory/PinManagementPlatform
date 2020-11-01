@@ -5,11 +5,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PinPlatform.Domain.Processors;
 using PinPlatform.Services.ClientAPI.DataModel;
+using PinPlatform.Services.Infrastructure.Authorization;
 
 namespace PinPlatform.Services.ClientAPI.Controllers
 {
+    /// <summary>
+    /// Everything around changing the pin from customer side
+    /// </summary>
     [ApiController]
-    [Authorize(Policy = "ClientAccess")]
+    [Route("v{version:apiversion}/{opcoid}")]
+    [Authorize(Policy = AuthorizationHelper.ClientAccessPolicy)]
     public class PinChangeController : ControllerBase
     {
         private readonly ILogger<PinChangeController> _logger;
@@ -20,10 +25,16 @@ namespace PinPlatform.Services.ClientAPI.Controllers
             _logger = logger;
             _pinChangeProcessor = pinChangeProcessor;
         }
-
+        /// <summary>
+        /// Change Pin with most of the information transfered in the http body
+        /// </summary>
+        /// <param name="opcoid">The OpCo ID</param>
+        /// <param name="request">The request details in the http body formatted as JSON</param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("v1/{opcoid}/pin")]
-        [Route("v1/{opcoid}/pin/change")]
+        [Route("pin")]
+        [Route("pin/change")]
+        [ApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PostChangePinAsync([FromRoute] string opcoid, [FromBody] DataModel.PinChangeRequestModel request)
         {
@@ -38,8 +49,18 @@ namespace PinPlatform.Services.ClientAPI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Change Pin with all information except the pins transfered in the URL
+        /// </summary>
+        /// <param name="opcoid">The OpCo ID</param>
+        /// <param name="householdid">The household ID</param>
+        /// <param name="profileid">The provide ID</param>
+        /// <param name="pintype">The pintype as number</param>
+        /// <param name="pindetails">The hash of the old pin and the new pin as JSON formatted body</param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("v1/{opcoid}/{householdid}/{profileid}/pin/{pintype}")]
+        [Route("{householdid}/{profileid}/pin/{pintype}")]
+        [ApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> PostChangePinAltAsync([FromRoute] string opcoid, [FromRoute] string householdid, [FromRoute] uint profileid, [FromRoute] uint pintype, [FromBody] PinChangeModel pindetails)
         {
